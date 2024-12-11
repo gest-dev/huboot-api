@@ -1,12 +1,8 @@
 
 <div align="center">
 <p>
-<a href="#"><img title="skynet" src="https://blogger.googleusercontent.com/img/a/AVvXsEiKE_6w5bcwsKhTrs0pefLv8pMizPxhO0V3QkD0pKwrN1EHAGJa_SfbPQpacsTa-QgQsZqWvI7ZqZBMP8s-N8h2ke8omsFggT1X1aK45vq4DvD_MLn-MLvXNg9m2z6Bhqp1Om_vRrpWeXdRmHK6xq_hDQDf9wySQmDPyzDQXGJ7l8DIzVwNmyOXpIKeV3c" alt="" width="200" height="200"></a>
-</p>
-<p>
-<h1 align="center">HUBOOT API</h1>
-<br>
-<h5 align="center">Whatsapp Api Multi Device</h5>
+<a href="#"><img title="skynet" src="https://blogger.googleusercontent.com/img/a/AVvXsEiKE_6w5bcwsKhTrs0pefLv8pMizPxhO0V3QkD0pKwrN1EHAGJa_SfbPQpacsTa-QgQsZqWvI7ZqZBMP8s-N8h2ke8omsFggT1X1aK45vq4DvD_MLn-MLvXNg9m2z6Bhqp1Om_vRrpWeXdRmHK6xq_hDQDf9wySQmDPyzDQXGJ7l8DIzVwNmyOXpIKeV3c" alt="" width="400"></a>
+    <h5 align="center">Whatsapp Api Multi Device</h5>
 </p>
 <br>
 </div>
