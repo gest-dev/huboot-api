@@ -1,0 +1,57 @@
+<%- include('../layout/simple-layout', { body: ` <div
+  class="container mt-1 d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="col-md-5">
+    <div class=" text-white text-center">
+      <img src="/img/logo.png" class="img-fluid w-25" alt="">
+      <h4>HUBOOT API</h4>
+    </div>
+    <div class="card shadow-lg rounded mt-3">
+
+      <div class="card-body">
+        <!-- Formulário de register -->
+        <form id="authRegister" method="POST">
+          <div>
+            <h4 class="text-center text-white">Registrar</h4>
+          </div>
+          <!-- name -->
+          <div class="mb-3">
+            <label for="fullname" class="form-label text-white">Nome</label>
+            <input type="text" id="fullname" name="fullname"
+              class="form-control form-control-default bg-transparent input-text-dark" placeholder="Digite seu nome"
+              required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label text-white">Email</label>
+            <input type="email" id="email" name="email"
+              class="form-control form-control-default bg-transparent input-text-dark" placeholder="Digite seu email"
+              required>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label text-white">Senha</label>
+            <input type="password" id="password" name="password"
+              class="form-control form-control-default bg-transparent input-text-dark" placeholder="Digite sua senha"
+              required>
+          </div>
+          <!-- repete password -->
+          <div class="mb-3">
+            <label for="passwordConfirm" class="form-label text-white">Repetir Senha</label>
+            <input type="password" id="passwordConfirm" name="passwordConfirm"
+              class="form-control form-control-default bg-transparent input-text-dark"
+              placeholder="Digite sua senha novamente" required>
+          </div>
+
+          <!-- Mensagem de erro -->
+          <div id="error-message" class="text-danger small mt-2"></div>
+
+          <button type="button" class="btn btn-success w-100 rounded-pill mt-3" onclick="athRegister()">Entrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+  `,
+  title: "Login"
+  }) %>
+  <!-- login.js -->
+  <script src="/js/pages/register.js"></script>

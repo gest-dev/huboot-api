@@ -1,0 +1,173 @@
+<div class="container mt-3 p-1">
+  <div class="row mt-0">
+    <div class="col-12 p-0">
+      <% if (InstanceInfo) { %>
+        <div class="mt-0 mb-2 p-0 d-flex justify-content-center">
+          <strong class="h4 text-white">
+            <%= InstanceInfo.name %>
+          </strong>
+        </div>
+        <div class="card ml-1 mr-1 shadow-success">
+          <div class="card-header p-1 px-3 mb-0 row">
+            <div class="col-12 col-md-6">
+              <p class="mt-1 mb-0 d-flex justify-content-center justify-content-md-start">
+                <!-- instance_session -->
+                <% if (InstanceInfo.instance_session && InstanceInfo.instance_session.phone_connected) { %>
+                  <span class="badge bg-success fs-7 text-white">Conectado</span>
+                  <% } else { %>
+                    <span class="badge bg-warning fs-7 text-white">Desconectado</span>
+                    <% } %>
+              </p>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="pt-2 pt-md-0 d-flex justify-content-center justify-content-md-end">
+                <button type="button" class="btn btn-outline-secondary me-2" id="idRefreshInstance"
+                  onclick="refreshInstance('<%= InstanceInfo.key %>')">
+                  <i class="bi bi-arrow-clockwise cursor-pointer fs-6"></i>
+                </button>
+                <% if(InstanceInfo.instance_session_previous){ %>
+                  <button type="button" class="btn btn-outline-primary me-2" id="idRestoreInstance"
+                    onclick="restoreInstanceVerify('<%= InstanceInfo.key %>')">
+                    Restaurar <i class="bi bi-arrow-repeat cursor-pointer fs-6"></i>
+                    <span id="idRestoreInstanceSpinner" style="display: none;">
+                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      <span class="visually-hidden">Loading...</span>
+                    </span>
+                  </button>
+                  <% } %>
+                    <% if (InstanceInfo.instance_session && InstanceInfo.instance_session.phone_connected) { %>
+                      <button type="button" class="btn btn-outline-danger" id="idDisconnectInstance"
+                        onclick="disconnectInstance('<%= InstanceInfo.key %>')">
+                        Desconectar <i class="bi bi-x-circle cursor-pointer fs-6"></i>
+                        <span id="idDisconnectInstanceSpinner" style="display: none;">
+                          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          <span class="visually-hidden">Loading...</span>
+                        </span>
+                      </button>
+                      <% } %>
+              </div>
+            </div>
+          </div>
+          <div class="card-body mt-0 px-2 pb-2">
+            <div class="row">
+              <div class="col-12 col-md-6">
+                <div>
+                  <strong class="text-white me-2 fs-7">Key:</strong>
+                  <div class="input-group">
+                    <input class="form-control form-control-default bg-transparent input-text-dark"
+                      id="key-instance-<%= InstanceInfo.key %>" type="password" value="<%= InstanceInfo.key %>">
+                    <span class="input-group-text cursor-pointer toggle-key-instance"
+                      data-key="<%= InstanceInfo.key %>">
+                      <i class="bi bi-eye-slash"></i>
+                    </span>
+                    <span class="input-group-text cursor-pointer toggle-key-copy" data-key="<%= InstanceInfo.key %>">
+                      <i class="bi bi-copy"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <strong class="text-white me-2 fs-7">Token:</strong>
+                  <div class="input-group">
+                    <input class="form-control form-control-default bg-transparent input-text-dark"
+                      id="token-<%= InstanceInfo.key %>" type="password" value="<%= InstanceInfo.token %>">
+                    <span class="input-group-text cursor-pointer toggle-token" data-key="<%= InstanceInfo.key %>">
+                      <i class="bi bi-eye-slash"></i>
+                    </span>
+                    <span class="input-group-text cursor-pointer toggle-token-copy" data-key="<%= InstanceInfo.key %>">
+                      <i class="bi bi-copy"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <% if (!InstanceInfo.instance_session || !InstanceInfo.instance_session.phone_connected) { %>
+                <div class="col-12 col-md-6  d-flex justify-content-center align-items-center">
+                  <div>
+                    <div class="mb-2 mt-1" id="qrcodeDiv" style="display: none;">
+                      <img src="" alt="QRCode" class="img-fluid" id="qrcodeSrc">
+                    </div>
+                    <p class="h6 text-white">Telefone não conectado</p>
+                    <button class="btn btn-warning w-100 text-white" onclick="getInstanceQr('<%= InstanceInfo.key %>')"
+                      id="idGetInstanceQr">
+                      Gerar QRCode
+                      <!-- spinner -->
+                      <span id="idGetInstanceQrSpinner" style="display: none;">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="visually-hidden">Loading...</span>
+                      </span>
+                    </button>
+                  </div>
+
+                </div>
+                <% }else if(InstanceInfo.instance_session && InstanceInfo.instance_session.phone_connected){ %>
+                  <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
+                    <div class="text-center mt-2 mt-md-0">
+                      <p class="h6 text-white mb-1">
+                        Telefone: <%= InstanceInfo.instance_session.user.id %>
+                      </p>
+                      <p class="h6 text-white mb-0">
+                        Última sincronização: <%= InstanceInfo.instance_session.last_sync %>
+                      </p>
+                      <p class="h6 text-white mb-0">
+                        Uptime: <%= InstanceInfo.instance_session.uptime %>
+                      </p>
+
+                    </div>
+                  </div>
+                  <% } %>
+            </div>
+          </div>
+
+        </div>
+        <hr class="mt-2 mb-2 bg-white">
+        <div class="mt-2">
+          <div class="row g-3">
+            <!-- Card Contatos -->
+            <div class="col-md-4">
+              <div class="card text-center text-light shadow-success">
+                <div class="card-body">
+                  <h5 class="card-title">Contatos</h5>
+                  <h2 class="card-text fw-bold">
+                    <%= InstanceInfo.dashboard && InstanceInfo.dashboard.contactCount
+                      ?InstanceInfo.dashboard.contactCount:0 %>
+                  </h2>
+                </div>
+              </div>
+            </div>
+            <!-- Card Chats -->
+            <div class="col-md-4">
+              <div class="card text-center text-light shadow-success">
+                <div class="card-body">
+                  <h5 class="card-title">Grupos</h5>
+                  <h2 class="card-text fw-bold">
+                    <%= InstanceInfo.dashboard && InstanceInfo.dashboard.groupCount ?InstanceInfo.dashboard.groupCount:0
+                      %>
+                  </h2>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Mensagens -->
+            <div class="col-md-4">
+              <div class="card text-center text-light shadow-success">
+                <div class="card-body">
+                  <h5 class="card-title">Mensagens Enviadas</h5>
+                  <h2 class="card-text fw-bold">
+                    <%= InstanceInfo.dashboard && InstanceInfo.dashboard.messagesSendCount
+                      ?InstanceInfo.dashboard.messagesSendCount:0 %>
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } else { %>
+          <div class="mt-0 mb-2 p-0 d-flex justify-content-center">
+            <div class="alert alert-danger" role="alert">
+              <strong>Erro!</strong> Não foi possível encontrar a instância.
+            </div>
+          </div>
+          <% } %>
+    </div>
+  </div>
+</div>

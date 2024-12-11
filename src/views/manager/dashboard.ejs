@@ -1,0 +1,31 @@
+<%- include('../layout/full-layout', { body: ` <div class="mt-2">
+  <!-- bem vindo -->
+  <main role="main" class="w-100">
+    <div class="p-2 my-3 text-white">
+      <div class="row">
+        <div class="text-start col-6">
+          <h1 class="h6 mb-0 text-white lh-1">Bem vindo</h1>
+          <small>Total de instâncias <span id="amount_instance">0</span></small>
+        </div>
+        <!-- criar nova instância -->
+        <div class="text-end col-6">
+          <button type="button" class="btn btn-outline-success" id="show-modal_new_instance">
+            <i class="bi bi-plus"></i> Nova instância
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr class="text-white">
+    <div class="">
+      <div class="row" id="instances_list">
+        <!-- List -->
+      </div>
+    </div>
+  </main>
+  </div>
+  `,
+  title: "DashBoard"
+  }) %>
+
+  <%- include('modals/dashboard/new_instance_modale') %>
+    <script src="/js/pages/manager/dashboard/dashboard.js"></script>

@@ -1,0 +1,10 @@
+# NODE
+node_modules
+
+# APPLICATION
+.env
+sessiondata
+
+# IDEs
+.vscode/settings.json
+.idea

@@ -1,0 +1,28 @@
+<!-- Scripts jquery.min.js -->
+<script src="/js/plugins/jquery.min.js"></script>
+<!-- Scripts jquery.loadingModal.js -->
+<script src="/js/plugins/jquery.loadingModal.js"></script>
+<!-- jquery cookie -->
+<script src="/js/plugins/jquery.cookie.min.js"></script>
+<!-- Scripts do Bootstrap -->
+<script src="/js/plugins/bootstrap.bundle.min.js"></script>
+<!-- Script Swal -->
+<script src="/js/plugins/sweetalert2.js"></script>
+<!-- Scripts commons.js -->
+<script src="/js/utils/commons.js"></script>
+
+
+<!-- toda vez que for carregar a apgina preciso que chame  Commons.loading.show() e quando finalziar chamar  Commons.loading.hide() -->
+<script>
+  $(document).ready(function () {
+    // Início do carregamento da página
+    Commons.loading.show();
+  });
+
+  $(window).on('load', function () {
+    // Finalização do carregamento da página
+    setTimeout(function () {
+      Commons.loading.hide();
+    }, 1000);
+  });
+</script>

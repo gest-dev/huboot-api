@@ -1,0 +1,29 @@
+<header class="navbar navbar-dark sticky-top bg-theme flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 text-start" href="/manager">
+    <img src="/img/logo.png" alt="" width="40" height="40">
+    <!-- esconder span em telas menores -->
+    <span class="d-none d-md-inline" style="font-size: 1rem;">
+      <strong class=" text-white">HUBOOT API</strong>
+    </span>
+  </a>
+  <% if (key) { %>
+  <div class="navbar-nav" style="margin-right: 70px;">
+  <% } else { %>
+  <div class="navbar-nav" style="margin-right: 20px;">
+  <% } %>
+    <div class="nav-item text-nowrap">
+      <button type="button" class="btn btn-danger px-1 py-0" onclick="authLogout()">
+        <i class="bi bi-power text-white fw-bold fs-4"></i>
+      </button>
+    </div>
+  </div>
+  <% if (key) { %>
+  <button class="navbar-toggler position-absolute d-md-none collapsed mt-2 px-1 py-1" type="button"
+    data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+    aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <% } %>
+</header>
+<!-- header.js -->
+<script src="/js/layout/header.js"></script>

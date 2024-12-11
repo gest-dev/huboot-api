@@ -1,0 +1,30 @@
+<!-- modal_new_instance.ejs -->
+<div class="modal fade" id="modal_new_instance" tabindex="-1" aria-labelledby="modal_new_instanceLabel"
+  data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="false" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nova Instância</h5>
+        <button type="button" class="btn-transparent text-white fs-4" data-bs-dismiss="modal" aria-label="Close">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Conteúdo do modal -->
+        <form id="newInstanceForm">
+          <div class="mb-3">
+            <label for="instanceName" class="form-label text-white">Nome da Instância</label>
+            <input type="text" class="form-control form-control-default bg-transparent input-text-dark"
+              id="instanceName" required>
+          </div>
+
+          <div class="text-end">
+            <button type="button" class="btn btn-success" id="modal_btn_new_instance">
+              <i class="bi bi-plus"></i>
+              Criar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
