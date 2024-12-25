@@ -128,25 +128,25 @@ async function listInstances() {
                 <div class="row">
                   <div class="col-9">
                       <div class="text-white me-2 fs-7"> 
-                        <strong>Telefone: <b>${instance?.instance_session?.user?.id?instance?.instance_session?.user?.id:''}</b></strong><br> 
-                        <strong>Última sincronização: <b> ${instance?.instance_session?.last_syn?instance?.instance_session?.last_syn:''}</b></strong> <br> 
-                        <strong>Uptime: <b>${instance?.instance_session?.uptime?instance?.instance_session?.uptime:''}</b></strong>
+                        <strong>Telefone: <b>${instance?.instance_session?.user?.id ? instance.instance_session.user.id : ''}</b></strong><br> 
+                        <strong>Última sincronização: <b> ${instance?.instance_session?.last_sync ? instance.instance_session.last_sync : ''}</b></strong> <br> 
+                        <strong>Uptime: <b>${instance?.instance_session?.uptime ? instance.instance_session.uptime : ''}</b></strong>
                       </div>
                   </div>
                   <div class="col-3">
                   `;
 
-            if (instance?.instance_session && instance.instance_session?.user && instance.instance_session.user?.profile_img) {
-           html_instances_list += `
+        if (instance?.instance_session && instance.instance_session?.user && instance.instance_session.user?.profile_img) {
+          html_instances_list += `
                     <span class="b-avatar rounded mb-2 text-end" style="width: 70px; height: 70px;">
                       <span class="b-avatar-img">
                         <img src="${instance.instance_session.user?.profile_img}" class="rounded shadow-success" alt="avatar" style="width: 70px; height: 70px;">
                       </span>
                     </span>
                     `;
-              }
+        }
 
-            html_instances_list += `
+        html_instances_list += `
                   </div>                  
                 </div>  
                 <div class="mt-2">
