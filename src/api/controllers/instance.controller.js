@@ -107,7 +107,8 @@ exports.list = async (req, res) => {
     let InstancesList = await Instances.find({});
 
     let dataInstance = [];
-    await InstancesList.map(async (instance) => {
+    for (const instance of InstancesList) {
+   
         let instanceWp = {
             name: instance.name,
             key: instance.key,
@@ -120,8 +121,7 @@ exports.list = async (req, res) => {
             instanceWp['instance_session'] = null
         }
         dataInstance.push(instanceWp)
-    });
-
+    }
 
     return res.json({
         error: false,

@@ -45,7 +45,7 @@ $(document).ready(function () {
     // Remove o elemento temporário
     document.body.removeChild(tempTextArea);
 
-    toastAlert("Key copiada com sucesso (método alternativo)");
+    toastAlert("Key copiada com sucesso");
   });
 
   // toggle-token-copy
@@ -66,7 +66,7 @@ $(document).ready(function () {
     // Remove o elemento temporário
     document.body.removeChild(tempTextArea);
 
-    toastAlert("token copiada com sucesso (método alternativo)");
+    toastAlert("token copiada com sucesso");
   });
 
 });

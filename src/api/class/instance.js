@@ -142,6 +142,8 @@ class WhatsAppInstance {
                 // Obter o número conectado
                 const connectedNumber = sock?.user?.id || sock?.user?.jid;
                 if (connectedNumber) {
+                    //DownloadProfile
+
                     // busca instance no banco Instances verifica a key se existe e se existir salva connectedNumber em lastPhoneId
                     let instanceDatabase = await InstancesModel.findOne({ key: this.key });
                     if (instanceDatabase) {
@@ -282,7 +284,7 @@ class WhatsAppInstance {
 
         // on new mssage
         sock?.ev.on('messages.upsert', async (m) => {
-         
+
             //console.log(m)
             if (m.type === 'prepend')
                 this.instance.messages.unshift(...m.messages)
@@ -522,11 +524,26 @@ class WhatsAppInstance {
 
 
     async getInstanceDetail(key) {
+
+
+        let user = {};
+        if (this.instance?.online) {
+
+            user = this.instance.sock?.user
+            try {
+                let getProfilePictureUrl = await WhatsAppInstances[key].getProfilePictureUrl(user?.id)
+                //console.log('urlImgProfile', getProfilePictureUrl);
+                user['profile_img'] = getProfilePictureUrl;
+            } catch (error) {
+                //console.log(error.message);
+            }
+        }
+
         return {
             instance_key: key,
             phone_connected: this.instance?.online,
             webhookUrl: this.instance.customWebhook,
-            user: this.instance?.online ? this.instance.sock?.user : {},
+            user: user,
             //authState.creds.lastAccountSyncTimestamp
             uptime: ((this.instance?.online && this.instance.sock?.authState && this.instance.sock?.authState.creds.lastAccountSyncTimestamp)
                 ? this.calcTimesTempToUptime(this.instance.sock?.authState.creds.lastAccountSyncTimestamp)
@@ -608,12 +625,17 @@ class WhatsAppInstance {
         return data
     }
 
-    async DownloadProfile(of) {
-        await this.verifyId(this.getWhatsAppId(of))
+    async getProfilePictureUrl(idPhone) {
         const ppUrl = await this.instance.sock?.profilePictureUrl(
-            this.getWhatsAppId(of),
+            this.getWhatsAppId(idPhone),
             'image'
         )
+        return ppUrl;
+    }
+
+    async DownloadProfile(of) {
+        await this.verifyId(this.getWhatsAppId(of))
+        let ppUrl = this.getProfilePictureUrl(of)
         return ppUrl
     }
 

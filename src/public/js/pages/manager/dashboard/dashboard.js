@@ -108,7 +108,7 @@ async function listInstances() {
         } else {
           instance_session = `<span class="badge bg-warning fs-7 text-white ">Desconectado</span>`;
         }
-        $("#instances_list").append(`
+        let html_instances_list = `
           <div class="col-12 col-md-6 col-lg-6 col-xl-6">
             <div class="card ml-1 mr-1 shadow-success">
               <div class="card-header p-1 px-3 mb-0">
@@ -116,15 +116,40 @@ async function listInstances() {
                 <a href="/manager/instance/${instance.key}" class="float-end text-decoration-none text-white">
                   <i class="bi bi-gear cursor-pointer fs-5"></i>
                 </a>
-                <span class="me-2 float-end text-decoration-none text-danger" onclick="deleteInstance('${instance.key}','${instance.name}')">
+                <span class="me-4 float-end text-decoration-none text-danger" onclick="deleteInstance('${instance.key}','${instance.name}')">
                   <i class="bi bi-trash cursor-pointer fs-5"></i>
                 </span>
               </div>
               <div class="card-body mt-0 px-2 pb-2">
                 <div class="mt-0 mb-0 p-0 d-flex justify-content-center">
                   <strong class="h4 text-white ">${instance.name}</strong>
+                </div>
+                  <hr class="bg-white">
+                <div class="row">
+                  <div class="col-9">
+                      <div class="text-white me-2 fs-7"> 
+                        <strong>Telefone: <b>${instance?.instance_session?.user?.id?instance?.instance_session?.user?.id:''}</b></strong><br> 
+                        <strong>Última sincronização: <b> ${instance?.instance_session?.last_syn?instance?.instance_session?.last_syn:''}</b></strong> <br> 
+                        <strong>Uptime: <b>${instance?.instance_session?.uptime?instance?.instance_session?.uptime:''}</b></strong>
+                      </div>
+                  </div>
+                  <div class="col-3">
+                  `;
+
+            if (instance?.instance_session && instance.instance_session?.user && instance.instance_session.user?.profile_img) {
+           html_instances_list += `
+                    <span class="b-avatar rounded mb-2 text-end" style="width: 70px; height: 70px;">
+                      <span class="b-avatar-img">
+                        <img src="${instance.instance_session.user?.profile_img}" class="rounded shadow-success" alt="avatar" style="width: 70px; height: 70px;">
+                      </span>
+                    </span>
+                    `;
+              }
+
+            html_instances_list += `
+                  </div>                  
                 </div>  
-                <div class=" mt-2">
+                <div class="mt-2">
                   <strong class="text-white me-2 fs-7">Key:</strong>
                   <div class="input-group">
                     <input class="form-control form-control-default bg-transparent input-text-dark" 
@@ -154,7 +179,10 @@ async function listInstances() {
               </div>
             </div>
           </div>
-        `)
+        `;
+        $("#instances_list").append(
+          html_instances_list
+        );
       }
       )
     }
@@ -213,7 +241,7 @@ $(document).ready(function () {
     // Remove o elemento temporário
     document.body.removeChild(tempTextArea);
 
-    toastAlert("Key copiada com sucesso (método alternativo)");
+    toastAlert("Key copiada com sucesso");
   });
 
   // toggle-token-copy
@@ -234,7 +262,7 @@ $(document).ready(function () {
     // Remove o elemento temporário
     document.body.removeChild(tempTextArea);
 
-    toastAlert("token copiada com sucesso (método alternativo)");
+    toastAlert("token copiada com sucesso");
   });
 
 });

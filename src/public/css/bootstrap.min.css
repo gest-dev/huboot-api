@@ -11749,3 +11749,15 @@ fieldset:disabled .btn {
 }
 
 /*# sourceMappingURL=bootstrap.min.css.map */
+
+.b-avatar .b-avatar-custom,
+.b-avatar .b-avatar-img,
+.b-avatar .b-avatar-text {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    mask-image: radial-gradient(#fff, #000)
+}
