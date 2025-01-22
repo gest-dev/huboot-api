@@ -86,7 +86,7 @@
                     <div class="mb-2 mt-1" id="qrcodeDiv" style="display: none;">
                       <img src="" alt="QRCode" class="img-fluid" id="qrcodeSrc">
                     </div>
-                    <p class="h6 text-white">Telefone não conectado</p>
+                    <p class="h6 text-white text-center">Telefone não conectado</p>
                     <button class="btn btn-warning w-100 text-white" onclick="getInstanceQr('<%= InstanceInfo.key %>')"
                       id="idGetInstanceQr">
                       Gerar QRCode
@@ -102,24 +102,26 @@
                 <% }else if(InstanceInfo.instance_session && InstanceInfo.instance_session.phone_connected){ %>
                   <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
                     <div class="text-center mt-2 mt-md-0">
-                      <% if (InstanceInfo?.instance_session && InstanceInfo.instance_session?.user && InstanceInfo.instance_session.user?.profile_img) { %>
-                        <p class="h6 text-white mb-1">                    
+                      <% if (InstanceInfo?.instance_session && InstanceInfo.instance_session?.user &&
+                        InstanceInfo.instance_session.user?.profile_img) { %>
+                        <p class="h6 text-white mb-1">
                           <span class="b-avatar rounded mb-2 text-center" style="width: 70px; height: 70px;">
                             <span class="b-avatar-img d-flex justify-content-center">
-                              <img src="<%= InstanceInfo.instance_session.user?.profile_img %>" class="rounded shadow-success" alt="avatar" style="width: 70px; height: 70px;">
+                              <img src="<%= InstanceInfo.instance_session.user?.profile_img %>"
+                                class="rounded shadow-success" alt="avatar" style="width: 70px; height: 70px;">
                             </span>
-                          </span>                                 
+                          </span>
                         </p>
-                      <% } %>
-                      <p class="h6 text-white mb-1">
-                        Telefone: <%= InstanceInfo.instance_session.user.id %>
-                      </p>
-                      <p class="h6 text-white mb-0">
-                        Última sincronização: <%= InstanceInfo.instance_session.last_sync %>
-                      </p>
-                      <p class="h6 text-white mb-0">
-                        Uptime: <%= InstanceInfo.instance_session.uptime %>
-                      </p>
+                        <% } %>
+                          <p class="h6 text-white mb-1">
+                            Telefone: <%= InstanceInfo.instance_session.user.id %>
+                          </p>
+                          <p class="h6 text-white mb-0">
+                            Última sincronização: <%= InstanceInfo.instance_session.last_sync %>
+                          </p>
+                          <p class="h6 text-white mb-0">
+                            Uptime: <%= InstanceInfo.instance_session.uptime %>
+                          </p>
                     </div>
                   </div>
                   <% } %>
