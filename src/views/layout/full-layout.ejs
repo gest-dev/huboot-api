@@ -100,24 +100,52 @@
     <div class="container-fluid">
       <div class="row">
         <% if (key) { %>
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse shadow" style="">
-          <div class="position-sticky pt-1">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link active mt-2 fs-5" aria-current="page" href="/manager">
-                  <i class="bi bi-house-door fw-bolder"></i>
-                  Dashboard
-                </a>
-              </li>          
-            </ul>     
-          </div>
-        </nav>
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <% } else { %>
-        <main class="col-md-12 ms-sm-auto col-lg-12 px-md-4">
-        <% } %>       
-          <%- body %> <!-- O conteúdo dinâmico da página -->
-        </main>
+          <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse shadow" style="">
+            <div class="position-sticky pt-1">
+              <ul class="nav flex-column bg-light p-2 rounded">
+                <li class="nav-item">
+                  <a class="nav-link text-dark active mt-1 fs-6 d-flex align-items-center"
+                    href="/manager/instance/<%= key %>">
+                    <i class="bi bi-house-door fw-bolder me-2"></i>
+                    Dashboard
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link text-dark fs-6 d-flex align-items-center" data-bs-toggle="collapse"
+                    href="#sidebarEvents" aria-expanded="true" aria-controls="sidebarEvents">
+                    <i class="bi bi-arrow-repeat fw-bolder me-2"></i>
+                    Events
+                  </a>
+
+
+                  <div class="collapse mt-2 ps-3 <% if (['webhook', 'web-socket' ].includes(menu)) { %> show    <% } %>"
+                    id="sidebarEvents">
+
+                    <ul class="list-unstyled">
+                      <li class="mb-1">
+                        <a class="nav-link text-dark ps-3" href="/manager/instance/<%= key %>/events/webhook">
+                          <i class="bi bi-link-45deg"></i> Webhook
+                        </a>
+                      </li>
+                      <li>
+                        <a class="nav-link text-dark ps-3" href="/manager/instance/<%= key %>/events/web-socket">
+                          <i class="bi bi-diagram-3-fill"></i> WebSocket
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+
+            </div>
+          </nav>
+          <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <% } else { %>
+              <main class="col-md-12 ms-sm-auto col-lg-12 px-md-4">
+                <% } %>
+                  <%- body %> <!-- O conteúdo dinâmico da página -->
+              </main>
       </div>
     </div>
     <%- include('script') %>

@@ -1,0 +1,262 @@
+<div class="container mt-3 p-1">
+  <div class="row mt-0">
+    <div class="col-12 p-0">
+      <% if (InstanceInfo) { %>
+        <div class="card shadow-success">
+          <div class="card-header p-1 px-3 mb-0">
+            <div class="d-flex justify-content-between align-items-center">
+              <h3 class="h4 text-white mb-0">Webhook</h3>
+              <div>
+                <button type="submit mr-1" class="btn btn-success">
+                  <i class="bi bi-save"></i>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body mt-0 px-2 pb-2">
+            <div class="row">
+              <div class="col-12 p-3">
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <label class="form-label text-white">Enabled</label>
+                      <p class="text-muted mb-0">Enable or disable the webhook</p>
+                    </div>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label for="urlInput" class="form-label text-white">URL</label>
+                  <input type="text" class="form-control bg-transparent text-white" id="urlInput">
+                </div>
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <label class="form-label text-white">Webhook by Events</label>
+                      <p class="text-muted mb-0">Create a route for each event by adding the event name to the
+                        end of the URL</p>
+                    </div>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault1">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <label class="form-label text-white">Webhook Base64</label>
+                      <p class="text-muted mb-0">Send media base64 data in webhook</p>
+                    </div>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault2">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4 d-flex justify-content-between">
+                  <button type="button" class="btn btn-outline-secondary">Mark All</button>
+                  <button type="button" class="btn btn-outline-secondary">Unmark All</button>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label text-white">Events</label>
+                  <div class="list-group">
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>APPLICATION_STARTUP</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CALL</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CHATS_DELETE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CHATS_SET</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CHATS_UPDATE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CHATS_UPSERT</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CONNECTION_UPDATE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CONTACTS_SET</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CONTACTS_UPDATE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>CONTACTS_UPSERT</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>GROUP_PARTICIPANTS_UPDATE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>GROUP_UPDATE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>GROUPS_UPSERT</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>LABELS_ASSOCIATION</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>LABELS_EDIT</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>LOGOUT_INSTANCE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>MESSAGES_DELETE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>MESSAGES_SET</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>MESSAGES_UPDATE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>MESSAGES_UPSERT</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>PRESENCE_UPDATE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>QRCODE_UPDATED</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>REMOVE_INSTANCE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>SEND_MESSAGE</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>TYPEBOT_CHANGE_STATUS</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                    <div
+                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                      <span>TYPEBOT_START</span>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } else { %>
+          <div class="mt-0 mb-2 p-0 d-flex justify-content-center">
+            <div class="alert alert-danger" role="alert">
+              <strong>Erro!</strong> Não foi possível encontrar a instância.
+            </div>
+          </div>
+          <% } %>
+    </div>
+  </div>
+</div>
