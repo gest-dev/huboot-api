@@ -3,9 +3,10 @@ const controller = require('../controllers/instance.controller')
 const keyVerify = require('../middlewares/keyCheck')
 const loginVerify = require('../middlewares/loginCheck')
 const { checkToken } = require("../middlewares/ChechToken");
-
+const { ChechTokenKeyInstance } = require("../middlewares/ChechTokenKeyInstance");
 const router = express.Router()
 
+// part auth
 router.route('/new').post(checkToken, controller.new)
 router.route('/list').get(checkToken, controller.list)
 router.route('/init').get(checkToken, controller.init)
@@ -21,6 +22,9 @@ router.route('/delete').delete(checkToken, keyVerify, controller.delete)
 // clear complete database general instance
 router.route('/delete/general').delete(checkToken, controller.deleteGeneral)
 
+// part token key access
+// instance status exter
+router.route('/status').get(ChechTokenKeyInstance, keyVerify, loginVerify, controller.status)
 
 
 module.exports = router

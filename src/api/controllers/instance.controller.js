@@ -357,3 +357,34 @@ exports.deleteGeneral = async (req, res) => {
         data: null,
     })
 }
+
+exports.status = async (req, res) => {
+    const key = req.query.key
+    let InstanceInfo = await Instances.findOne({ key: key });
+    if (!InstanceInfo) {
+        return res.status(422).json({
+            "error": true,
+            "message": "invalid key supplied DB"
+        })
+    }
+    let InstanceInfoWp = {
+        name: InstanceInfo.name,
+        createdAt: InstanceInfo.createdAt,
+    };
+    const instance = WhatsAppInstances[key]
+
+    try {
+        if (!instance) {
+            InstanceInfoWp['instance_session'] = null
+        } else {
+            InstanceInfoWp['instance_session'] = await instance.getInstanceDetail(key)
+        }
+    } catch (error) {
+        InstanceInfoWp['instance_session'] = null
+    }
+    return res.json({
+        error: false,
+        message: 'Instance fetched successfully',
+        instance_data: InstanceInfoWp,
+    })
+}
