@@ -1,4 +1,4 @@
-/* eslint-disable no-unsafe-optional-chaining */
+const InstanceConfigWebhook = require("../models/InstanceConfigWebhook.model");
 const QRCode = require('qrcode')
 const pino = require('pino')
 const {
@@ -31,8 +31,6 @@ class WhatsAppInstance {
     }
     key = ''
     authState
-    allowWebhook = undefined
-    webhook = undefined
 
     instance = {
         key: this.key,
@@ -40,40 +38,37 @@ class WhatsAppInstance {
         qr: '',
         messages: [],
         qrRetry: 0,
-        customWebhook: '',
     }
 
-    axiosInstance = axios.create({
-        baseURL: config.webhookUrl,
-    })
 
-    constructor(key, allowWebhook, webhook) {
+
+    constructor(key) {
         this.key = key ? key : uuidv4()
-        this.instance.customWebhook = this.webhook ? this.webhook : webhook
-        this.allowWebhook = config.webhookEnabled
-            ? config.webhookEnabled
-            : allowWebhook
-        if (this.allowWebhook && this.instance.customWebhook !== null) {
-            this.allowWebhook = true
-            this.instance.customWebhook = webhook
-            this.axiosInstance = axios.create({
-                baseURL: webhook,
-            })
-        }
+      
     }
 
-    async SendWebhook(type, body, key) {
-        if (!this.allowWebhook) return
+    async SendWebhook(event, body, key, instanceConfigWebhookConfig, type_send_message = 'other') {
+        console.log('opssssss', instanceConfigWebhookConfig);
+
+        if (!instanceConfigWebhookConfig || instanceConfigWebhookConfig.status === false) return
+
+        const axiosInstance = axios.create({
+            baseURL: instanceConfigWebhookConfig.url,
+        })
 
         //let messageToString = JSON.stringify(body)
-        this.axiosInstance
-            .post('', {
-                type,
-                body,
-                instanceKey: key,
-            })
+        let bodyData = {
+            instanceKey: key,
+            type_send_message,
+            event,
+            data: body
+        }
+        console.log(bodyData);
+
+        await axiosInstance
+            .post('', bodyData)
             .then((response) => {
-                //console.log('Webhook sent: ', response.data)
+                console.log('Webhook sent: ', response.data)
             })
             .catch((error) => {
                 console.log('Error sending webhook: ', error.message)
@@ -87,7 +82,10 @@ class WhatsAppInstance {
         this.socketConfig.auth = this.authState.state
         this.socketConfig.browser = Object.values(config.browser)
         this.instance.sock = makeWASocket(this.socketConfig)
+      
         this.setHandler()
+       
+
         return this
     }
 
@@ -124,9 +122,11 @@ class WhatsAppInstance {
                         await instanceDatabase.save();
                     }
                 }
+                const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
 
-                if (['all', 'connection', 'connection.update', 'connection:close'].some((e) => config.webhookAllowedEvents.includes(e))) {
-                    await this.SendWebhook('connection', { connection: connection }, this.key);
+                if (instanceConfigWebhookConfig &&
+                    ['all', 'connection', 'connection.update', 'connection:close'].some((e) => instanceConfigWebhookConfig.events.includes(e))) {
+                    await this.SendWebhook('connection', { connection: connection }, this.key, instanceConfigWebhookConfig);
                 }
             } else if (connection === 'open') {
                 // console.log('Connection opened');
@@ -153,8 +153,9 @@ class WhatsAppInstance {
                 }
 
                 this.instance.online = true;
-                if (['all', 'connection', 'connection.update', 'connection:open'].some((e) => config.webhookAllowedEvents.includes(e))) {
-                    await this.SendWebhook('connection', { connection: connection }, this.key);
+                const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+                if (instanceConfigWebhookConfig && ['all', 'connection', 'connection.update', 'connection:open'].some((e) => instanceConfigWebhookConfig.events.includes(e))) {
+                    await this.SendWebhook('connection', { connection: connection }, this.key, instanceConfigWebhookConfig);
                 }
             }
 
@@ -176,50 +177,57 @@ class WhatsAppInstance {
 
         // sending presence
         sock?.ev.on('presence.update', async (json) => {
-            if (
+
+            const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+            if (instanceConfigWebhookConfig &&
                 ['all', 'presence', 'presence.update'].some((e) =>
-                    config.webhookAllowedEvents.includes(e)
+                    instanceConfigWebhookConfig.events.includes(e)
                 )
-            )
-                await this.SendWebhook('presence', json, this.key)
+            ) {
+                await this.SendWebhook('presence', json, this.key, instanceConfigWebhookConfig);
+            }
+
         })
 
         // contacts update
         sock?.ev.on('contacts.update', async (json) => {
 
-            if (
+            const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+            if (instanceConfigWebhookConfig &&
                 ['all', 'contacts', 'contacts.update'].some((e) =>
-                    config.webhookAllowedEvents.includes(e)
+                    instanceConfigWebhookConfig.events.includes(e)
                 )
             ) {
-                await this.SendWebhook('contacts', json, this.key)
+                await this.SendWebhook('contacts', json, this.key, instanceConfigWebhookConfig);
             }
         })
 
         //If you only want to export all the numbers saved in your contact list, you can do it as follows:
         sock?.ev.on('contacts.upsert', async (data) => {
 
-            if (
+            const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+            if (instanceConfigWebhookConfig &&
                 ['all', 'contacts', 'contacts.upsert'].some((e) =>
-                    config.webhookAllowedEvents.includes(e)
+                    instanceConfigWebhookConfig.events.includes(e)
                 )
             ) {
-                await this.SendWebhook('contacts', data, this.key)
+                await this.SendWebhook('contacts', data, this.key, instanceConfigWebhookConfig);
             }
 
         })
         //If you want to export numbers from all your previous individual conversations, you can do it as follows:
         sock.ev.on('messaging-history.set', async (data) => {
             const messagingHistoryData = data.contacts;
-            if (
+            const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+            if (instanceConfigWebhookConfig &&
                 ['all', 'contacts-history', 'messaging-history.set'].some((e) =>
-                    config.webhookAllowedEvents.includes(e)
+                    instanceConfigWebhookConfig.events.includes(e)
                 )
             ) {
                 const filteredContacts = messagingHistoryData.filter((item) =>
                     item.id.endsWith("@s.whatsapp.net")
                 );
-                await this.SendWebhook('contacts', filteredContacts, this.key)
+                await this.SendWebhook('contacts', filteredContacts, this.key, instanceConfigWebhookConfig);
             }
 
             this.saveContactsAndGroups(messagingHistoryData);
@@ -326,7 +334,9 @@ class WhatsAppInstance {
                 if (messageType === 'conversation') {
                     webhookData['text'] = m
                 }
-                if (config.webhookBase64) {
+                console.log('teste pessoal');
+                const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+                if (instanceConfigWebhookConfig && instanceConfigWebhookConfig.base64) {
                     switch (messageType) {
                         case 'imageMessage':
                             webhookData['msgContent'] = await downloadMessage(
@@ -351,22 +361,25 @@ class WhatsAppInstance {
                             break
                     }
                 }
-                if (
+                console.log(instanceConfigWebhookConfig, ['all', 'messages', 'messages.upsert'].some((e) =>
+                    instanceConfigWebhookConfig.events.includes(e)));
+
+                if (instanceConfigWebhookConfig &&
                     ['all', 'messages', 'messages.upsert'].some((e) =>
-                        config.webhookAllowedEvents.includes(e)
+                        instanceConfigWebhookConfig.events.includes(e)
                     )
                 ) {
 
                     if (webhookData?.pushName && !webhookData?.key?.participant) {
                         //console.log('Chegou webhookData de  direct_user: ', webhookData);
                         // tipo de mensgaem
-                        webhookData['type_send_message'] = 'direct_user';
-                        await this.SendWebhook('message', webhookData, this.key)
+                        const type_send_message = 'direct_user';
+                        await this.SendWebhook('messages.upsert', webhookData, this.key, instanceConfigWebhookConfig, type_send_message);
                     } else {
                         //console.log('Chegou webhookData de  group: ', webhookData);
                         // tipo de mensgaem
-                        webhookData['type_send_message'] = 'group';
-                        await this.SendWebhook('message', webhookData, this.key)
+                        const type_send_message = 'group';
+                        await this.SendWebhook('messages.upsert', webhookData, this.key, instanceConfigWebhookConfig, type_send_message);
                     }
 
                 }
@@ -382,9 +395,10 @@ class WhatsAppInstance {
             if (data.content) {
                 if (data.content.find((e) => e.tag === 'offer')) {
                     const content = data.content.find((e) => e.tag === 'offer')
-                    if (
+                    const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+                    if (instanceConfigWebhookConfig &&
                         ['all', 'call', 'CB:call', 'call:offer'].some((e) =>
-                            config.webhookAllowedEvents.includes(e)
+                            instanceConfigWebhookConfig.events.includes(e)
                         )
                     )
                         await this.SendWebhook(
@@ -405,9 +419,10 @@ class WhatsAppInstance {
                         (e) => e.tag === 'terminate'
                     )
 
-                    if (
+                    const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+                    if (instanceConfigWebhookConfig &&
                         ['all', 'call', 'call:terminate'].some((e) =>
-                            config.webhookAllowedEvents.includes(e)
+                            instanceConfigWebhookConfig.events.includes(e)
                         )
                     )
                         await this.SendWebhook(
@@ -430,9 +445,10 @@ class WhatsAppInstance {
             //console.log('groups.upsert')
             //console.log(newChat)
             this.createGroupByApp(newChat)
-            if (
+            const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+            if (instanceConfigWebhookConfig &&
                 ['all', 'groups', 'groups.upsert'].some((e) =>
-                    config.webhookAllowedEvents.includes(e)
+                    instanceConfigWebhookConfig.events.includes(e)
                 )
             )
                 await this.SendWebhook(
@@ -448,9 +464,10 @@ class WhatsAppInstance {
             //console.log('groups.update')
             //console.log(newChat)
             this.updateGroupSubjectByApp(newChat)
-            if (
+            const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+            if (instanceConfigWebhookConfig &&
                 ['all', 'groups', 'groups.update'].some((e) =>
-                    config.webhookAllowedEvents.includes(e)
+                    instanceConfigWebhookConfig.events.includes(e)
                 )
             )
                 await this.SendWebhook(
@@ -466,13 +483,14 @@ class WhatsAppInstance {
             //console.log('group-participants.update')
             //console.log(newChat)
             this.updateGroupParticipantsByApp(newChat)
-            if (
+            const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
+            if (instanceConfigWebhookConfig &&
                 [
                     'all',
                     'groups',
                     'group_participants',
                     'group-participants.update',
-                ].some((e) => config.webhookAllowedEvents.includes(e))
+                ].some((e) => instanceConfigWebhookConfig.events.includes(e))
             )
                 await this.SendWebhook(
                     'group_participants_updated',
@@ -542,7 +560,6 @@ class WhatsAppInstance {
         return {
             instance_key: key,
             phone_connected: this.instance?.online,
-            webhookUrl: this.instance.customWebhook,
             user: user,
             //authState.creds.lastAccountSyncTimestamp
             uptime: ((this.instance?.online && this.instance.sock?.authState && this.instance.sock?.authState.creds.lastAccountSyncTimestamp)

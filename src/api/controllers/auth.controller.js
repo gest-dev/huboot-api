@@ -5,6 +5,7 @@ const { addMinutes } = require('date-fns');
 // schemas
 const schemaLogin = require("../schemas/login.schemas");
 const schemaRegister = require("../schemas/registrer.schemas");
+
 // models
 const User = require("../models/User.model");
 const InvalidToken = require("../models/InvalidToken.model");

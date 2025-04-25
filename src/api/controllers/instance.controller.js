@@ -9,6 +9,7 @@ const AuthAccessToken = require('../class/authAccessToken')
 const Instances = require("../models/instances.model");
 const GroupsModel = require('../models/Groups.model')
 const ContactsModel = require('../models/Contacts.model')
+const InstanceConfigWebhook = require("../models/InstanceConfigWebhook.model");
 
 exports.new = async (req, res) => {
     try {
@@ -108,7 +109,7 @@ exports.list = async (req, res) => {
 
     let dataInstance = [];
     for (const instance of InstancesList) {
-   
+
         let instanceWp = {
             name: instance.name,
             key: instance.key,
@@ -146,23 +147,31 @@ exports.init = async (req, res) => {
         createdAt: InstanceInfo.createdAt,
     };
 
-    const webhook = !req.query.webhook ? false : req.query.webhook
-    const webhookUrl = !req.query.webhookUrl ? null : req.query.webhookUrl
     const appUrl = config.appUrl || req.protocol + '://' + req.headers.host
-    const instance = new WhatsAppInstance(key, webhook, webhookUrl)
+    const instance = new WhatsAppInstance(key)
     const data = await instance.init()
     WhatsAppInstances[data.key] = instance
 
     InstanceInfoWp['instance_session'] = await WhatsAppInstances[data.key].getInstanceDetail(data.key)
+    const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: data.key });
+    let webhookInfo = null;
+    if (instanceConfigWebhookConfig) {
+        webhookInfo = {
+            enabled: instanceConfigWebhookConfig.status,
+            webhookUrl: instanceConfigWebhookConfig.url,
+        };
+    } else {
+        webhookInfo = {
+            enabled: null,
+            webhookUrl: null,
+        }
+    }
     res.json({
         error: false,
         message: 'Initializing successfully',
         key: data.key,
         InstanceInfoWp: InstanceInfoWp,
-        webhook: {
-            enabled: webhook,
-            webhookUrl: webhookUrl,
-        },
+        webhook: webhookInfo,
         browser: config.browser,
     })
 }

@@ -7,7 +7,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <h3 class="h4 text-white mb-0">Webhook</h3>
               <div>
-                <button type="submit mr-1" class="btn btn-success">
+                <button type="button" class="btn btn-success" id="webhookEditSave" data-key="<%= key %>">
                   <i class="bi bi-save"></i>
                   Save
                 </button>
@@ -24,25 +24,16 @@
                       <p class="text-muted mb-0">Enable or disable the webhook</p>
                     </div>
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                      <input class="form-check-input" type="checkbox" role="switch" id="wehbhookStatus"
+                        name="wehbhookStatus" <%=instanceConfigWebhook && instanceConfigWebhook.status ? 'checked' : ''
+                        %>>
                     </div>
                   </div>
                 </div>
                 <div class="mb-4">
-                  <label for="urlInput" class="form-label text-white">URL</label>
-                  <input type="text" class="form-control bg-transparent text-white" id="urlInput">
-                </div>
-                <div class="mb-4">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <label class="form-label text-white">Webhook by Events</label>
-                      <p class="text-muted mb-0">Create a route for each event by adding the event name to the
-                        end of the URL</p>
-                    </div>
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault1">
-                    </div>
-                  </div>
+                  <label for="webhookUrl" class="form-label text-white">URL</label>
+                  <input type="text" class="form-control bg-transparent text-white" id="webhookUrl" name="webhookUrl"
+                    value="<%= instanceConfigWebhook ?instanceConfigWebhook.url:'' %>">
                 </div>
                 <div class="mb-4">
                   <div class="d-flex justify-content-between align-items-center">
@@ -51,200 +42,275 @@
                       <p class="text-muted mb-0">Send media base64 data in webhook</p>
                     </div>
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault2">
+                      <input class="form-check-input" type="checkbox" role="switch" id="wehbhookBase64"
+                        name="wehbhookBase64" <%=instanceConfigWebhook && instanceConfigWebhook.base64 ? 'checked' : ''
+                        %> >
+
                     </div>
                   </div>
                 </div>
                 <div class="mb-4 d-flex justify-content-between">
-                  <button type="button" class="btn btn-outline-secondary">Mark All</button>
-                  <button type="button" class="btn btn-outline-secondary">Unmark All</button>
+                  <button type="button" class="btn btn-outline-secondary" id="webhookEventsFormMarkAll">
+                    Mark All</button>
+                  <button type="button" class="btn btn-outline-secondary" id="webhookEventsFormUnmarkAll">
+                    Unmark All</button>
                 </div>
                 <div class="mb-4">
-                  <label class="form-label text-white">Events</label>
-                  <div class="list-group">
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>APPLICATION_STARTUP</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
+                  <form class="" id="webhookEventsForm">
+                    <label class="form-label text-white">Events</label>
+                    <div class="list-group">
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CALL</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="call"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('call') ? 'checked' : ''
+                            %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CHATS_DELETE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="chats.delete"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('chats.delete')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CHATS_SET</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="chats.set"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('chats.set') ? 'checked'
+                            : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CHATS_UPDATE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="chats.update"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('chats.update')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CHATS_UPSERT</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="chats.upsert"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('chats.upsert')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CONNECTION_UPDATE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="connection.update"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('connection.update')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CONTACTS_SET</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="contacts.set"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('contacts.set')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CONTACTS_UPDATE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="contacts.update"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('contacts.update')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>CONTACTS_UPSERT</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="contacts.upsert"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('contacts.upsert')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>GROUP_PARTICIPANTS_UPDATE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch"
+                            value="group-participants.update" <%=instanceConfigWebhook &&
+                            instanceConfigWebhook.events.includes('group-participants.update') ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>GROUP_UPDATE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="group.update"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('group.update')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>GROUPS_UPSERT</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="groups.upsert"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('groups.upsert')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>LABELS_ASSOCIATION</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="labels.association"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('labels.association')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>LABELS_EDIT</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="labels.edit"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('labels.edit') ? 'checked'
+                            : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>LOGOUT_INSTANCE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="logout.instance"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('logout.instance')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>MESSAGES_DELETE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="messages.delete"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('messages.delete')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>MESSAGES_SET</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="messages.set"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('messages.set')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>MESSAGES_UPDATE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="messages.update"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('messages.update')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>MESSAGES_UPSERT</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="messages.upsert"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('messages.upsert')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>PRESENCE_UPDATE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="presence.update"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('presence.update')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>QRCODE_UPDATED</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="qrcode.updated"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('qrcode.updated')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>REMOVE_INSTANCE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="remove.instance"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('remove.instance')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>SEND_MESSAGE</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="send.message"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('send.message')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>TYPEBOT_CHANGE_STATUS</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="typebot_change.status"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('typebot_change.status')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
+                        <span>TYPEBOT_START</span>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" value="typebot.start"
+                            <%=instanceConfigWebhook && instanceConfigWebhook.events.includes('typebot.start')
+                            ? 'checked' : '' %>
+                          >
+                        </div>
                       </div>
                     </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CALL</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CHATS_DELETE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CHATS_SET</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CHATS_UPDATE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CHATS_UPSERT</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CONNECTION_UPDATE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CONTACTS_SET</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CONTACTS_UPDATE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>CONTACTS_UPSERT</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>GROUP_PARTICIPANTS_UPDATE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>GROUP_UPDATE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>GROUPS_UPSERT</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>LABELS_ASSOCIATION</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>LABELS_EDIT</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>LOGOUT_INSTANCE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>MESSAGES_DELETE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>MESSAGES_SET</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>MESSAGES_UPDATE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>MESSAGES_UPSERT</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>PRESENCE_UPDATE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>QRCODE_UPDATED</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>REMOVE_INSTANCE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>SEND_MESSAGE</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>TYPEBOT_CHANGE_STATUS</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                    <div
-                      class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
-                      <span>TYPEBOT_START</span>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
-                      </div>
-                    </div>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>

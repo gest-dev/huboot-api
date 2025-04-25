@@ -28,17 +28,9 @@ class Session {
                 db.collection(key)
                     .find(query)
                     .toArray(async (err, result) => {
-                        if (err) throw err
-                        const webhook = !config.webhookEnabled
-                            ? undefined
-                            : config.webhookEnabled
-                        const webhookUrl = !config.webhookUrl
-                            ? undefined
-                            : config.webhookUrl
+                        if (err) throw err                   
                         const instance = new WhatsAppInstance(
                             key,
-                            webhook,
-                            webhookUrl
                         )
                         await instance.init()
                         WhatsAppInstances[key] = instance
