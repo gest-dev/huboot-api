@@ -48,7 +48,6 @@ class WhatsAppInstance {
     }
 
     async SendWebhook(event, body, key, instanceConfigWebhookConfig, type_send_message = 'other') {
-        console.log('opssssss', instanceConfigWebhookConfig);
 
         if (!instanceConfigWebhookConfig || instanceConfigWebhookConfig.status === false) return
 
@@ -63,12 +62,10 @@ class WhatsAppInstance {
             event,
             data: body
         }
-        console.log(bodyData);
-
         await axiosInstance
             .post('', bodyData)
             .then((response) => {
-                console.log('Webhook sent: ', response.data)
+                //console.log('Webhook sent: ', response.data)
             })
             .catch((error) => {
                 console.log('Error sending webhook: ', error.message)
@@ -334,7 +331,7 @@ class WhatsAppInstance {
                 if (messageType === 'conversation') {
                     webhookData['text'] = m
                 }
-                console.log('teste pessoal');
+               
                 const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
                 if (instanceConfigWebhookConfig && instanceConfigWebhookConfig.base64) {
                     switch (messageType) {
@@ -361,8 +358,6 @@ class WhatsAppInstance {
                             break
                     }
                 }
-                console.log(instanceConfigWebhookConfig, ['all', 'messages', 'messages.upsert'].some((e) =>
-                    instanceConfigWebhookConfig.events.includes(e)));
 
                 if (instanceConfigWebhookConfig &&
                     ['all', 'messages', 'messages.upsert'].some((e) =>
