@@ -3,6 +3,15 @@ const mongoose = require('mongoose')
 const logger = require('pino')()
 dotenv.config()
 
+const semver = require('semver');
+const requiredNodeVersion = '>=20.0.0 <23.0.0';
+
+if (!semver.satisfies(process.version, requiredNodeVersion)) {
+    console.error(`Erro: Esta aplicação requer Node.js na versão ${requiredNodeVersion}. Versão atual: ${process.version}`);
+    process.exit(1);
+ 
+}
+
 const app = require('./config/express')
 const config = require('./config/config')
 
