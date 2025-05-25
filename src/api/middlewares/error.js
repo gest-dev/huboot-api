@@ -19,9 +19,15 @@ exports.handler = handler
 exports.notFound = (req, res, next) => {
     let monolitoEjs = (req.headers.accept && req.headers.accept.includes('text/html')) ? true : false;
     if (monolitoEjs) {
-        req.flash('error', 'Página não encontrada.');
-        res.status(404)
-            .render('not-found'); // Certifique-se de criar a view 404.ejs
+        // se a rota for raiz / então deve ir para  /manager
+        if (req.url === '/') {
+            return res.redirect('/manager');
+        } else {
+            req.flash('error', 'Página não encontrada.');
+            res.status(404)
+                .render('not-found'); // Certifique-se de criar a view 404.ejs
+        }
+
     } else {
         const err = new APIError({
             message: 'Not found',

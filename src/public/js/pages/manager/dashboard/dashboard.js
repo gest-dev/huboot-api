@@ -109,7 +109,7 @@ async function listInstances() {
           instance_session = `<span class="badge bg-warning fs-7 text-white ">Desconectado</span>`;
         }
         let html_instances_list = `
-          <div class="col-12 col-md-6 col-lg-6 col-xl-6">
+          <div class="col-12 col-md-6 col-lg-6 col-xl-6 py-1">
             <div class="card ml-1 mr-1 shadow-success">
               <div class="card-header p-1 px-3 mb-0">
                  <p class="mt-1 mb-0 float-start">${instance_session}</p>
