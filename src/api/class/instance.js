@@ -44,7 +44,7 @@ class WhatsAppInstance {
 
     constructor(key) {
         this.key = key ? key : uuidv4()
-      
+
     }
 
     async SendWebhook(event, body, key, instanceConfigWebhookConfig, type_send_message = 'other') {
@@ -79,9 +79,9 @@ class WhatsAppInstance {
         this.socketConfig.auth = this.authState.state
         this.socketConfig.browser = Object.values(config.browser)
         this.instance.sock = makeWASocket(this.socketConfig)
-      
+
         this.setHandler()
-       
+
 
         return this
     }
@@ -331,7 +331,7 @@ class WhatsAppInstance {
                 if (messageType === 'conversation') {
                     webhookData['text'] = m
                 }
-               
+
                 const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
                 if (instanceConfigWebhookConfig && instanceConfigWebhookConfig.base64) {
                     switch (messageType) {
@@ -573,6 +573,7 @@ class WhatsAppInstance {
     }
 
     async verifyId(id) {
+
         if (id.includes('@g.us')) return true
         const [result] = await this.instance.sock?.onWhatsApp(id)
         if (result?.exists) return true
@@ -765,6 +766,7 @@ class WhatsAppInstance {
     async getUserOrGroupById(id) {
         try {
             let Chats = await this.getChat()
+            console.log(Chats)
             const group = Chats.find((c) => c.id === this.getWhatsAppId(id))
             if (!group)
                 throw new Error(

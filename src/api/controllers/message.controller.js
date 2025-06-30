@@ -1,6 +1,13 @@
 // Função para formatar o número de telefone
 const { VerifiNumberId } = require('../class/verifiNumberId')
 
+function textErrorNumberInvalid(group) {
+    if (group) {
+        return "ID de grupo inválido. O identificador de grupo deve terminar com '@g.us'. Exemplo: 120003324939242500@g.us.";
+    } else {
+        return "Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511990000000.";
+    }
+}
 exports.Text = async (req, res) => {
     let group = req.body?.group || false;
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
@@ -8,7 +15,7 @@ exports.Text = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
 
@@ -32,7 +39,7 @@ exports.Image = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendMediaFile(
@@ -51,7 +58,7 @@ exports.Video = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendMediaFile(
@@ -70,7 +77,7 @@ exports.Audio = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendMediaFile(
@@ -88,7 +95,7 @@ exports.Document = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendMediaFile(
@@ -108,7 +115,7 @@ exports.Mediaurl = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendUrlMediaFile(
@@ -128,7 +135,7 @@ exports.Button = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendButtonMessage(
@@ -145,7 +152,7 @@ exports.Contact = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendContactMessage(
@@ -162,7 +169,7 @@ exports.List = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendListMessage(
@@ -179,7 +186,7 @@ exports.MediaButton = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Invalid phone number',
+            message: textErrorNumberInvalid(group),
         });
     }
     const data = await WhatsAppInstances[req.query.key].sendMediaButtonMessage(
