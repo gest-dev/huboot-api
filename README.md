@@ -155,14 +155,14 @@ curl --location --request POST 'localhost:3333/message/text?key=INSTANCE_KEY_HER
 
 | Route                | Source File                                                                                                          |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Auth Routes          | [auth.route.js](https://github.com/gest-dev/whatsapp-api-multi-device/blob/main/src/api/routes/auth.route.js)        |
-| Manager Routes       | [manager.route.js](https://github.com/gest-dev/whatsapp-api-multi-device/blob/main/src/api/routes/manager.route.js)  |
-| Instance Routes      | [instance.route.js](https://github.com/gest-dev/whatsapp-api-multi-device/blob/main/src/api/routes/instance.route.js)|
-| Message Routes       | [message.route.js](https://github.com/gest-dev/whatsapp-api-multi-device/blob/main/src/api/routes/message.route.js)  |
-| Group Routes         | [group.route.js](https://github.com/gest-dev/whatsapp-api-multi-device/blob/main/src/api/routes/group.route.js)      |
-| Miscellaneous Routes | [misc.route.js](https://github.com/gest-dev/whatsapp-api-multi-device/blob/main/src/api/routes/misc.route.js)        |
+| Auth Routes          | [auth.route.js](https://github.com/gest-dev/huboot-api/blob/master/src/api/routes/auth.route.js)        |
+| Manager Routes       | [manager.route.js](https://github.com/gest-dev/huboot-api/blob/master/src/api/routes/manager.route.js)  |
+| Instance Routes      | [instance.route.js](https://github.com/gest-dev/huboot-api/blob/master/src/api/routes/instance.route.js)|
+| Message Routes       | [message.route.js](https://github.com/gest-dev/huboot-api/blob/master/src/api/routes/message.route.js)  |
+| Group Routes         | [group.route.js](https://github.com/gest-dev/huboot-api/blob/master/src/api/routes/group.route.js)      |
+| Miscellaneous Routes | [misc.route.js](https://github.com/gest-dev/huboot-api/blob/master/src/api/routes/misc.route.js)        |
 
-See all routes here [src/api/routes](https://github.com/gest-dev/whatsapp-api-multi-device/tree/master/src/api/routes)
+See all routes here [src/api/routes](https://github.com/gest-dev/huboot-api/blob/master/src/api/routes)
 
 # Note
 
