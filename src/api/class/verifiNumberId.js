@@ -63,6 +63,15 @@ class VerifiNumberId {
         return phoneNumber;
     }
 
+    static testFormatGroupId(groupId) {
+        // verifica se o grupo tem o formato 120363324939242591@g.us conter @g.us e ter no maximo 40 caracteres
+        if (groupId.endsWith('@g.us') && groupId.length <= 40 && groupId.length > 5) {
+            return groupId;
+        } else {
+            return null;
+        }
+    }
+
 }
 
 exports.VerifiNumberId = VerifiNumberId

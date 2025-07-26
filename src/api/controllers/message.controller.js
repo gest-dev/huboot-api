@@ -12,7 +12,7 @@ exports.Text = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -38,7 +38,7 @@ exports.Image = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -59,7 +59,7 @@ exports.Video = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -80,7 +80,7 @@ exports.Audio = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -100,7 +100,7 @@ exports.Document = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -122,7 +122,7 @@ exports.Mediaurl = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -144,7 +144,7 @@ exports.Button = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -163,7 +163,7 @@ exports.Contact = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -182,7 +182,7 @@ exports.List = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
@@ -201,7 +201,7 @@ exports.MediaButton = async (req, res) => {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
-    let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
