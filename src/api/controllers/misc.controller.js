@@ -5,10 +5,10 @@ exports.onWhatsapp = async (req, res) => {
     // eslint-disable-next-line no-unsafe-optional-chaining
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
-      if (formatPhoneNumberId === null) {
+    if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000.',
+            message: 'Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000',
         });
     }
     const data = await WhatsAppInstances[req.query.key]?.verifyId(
@@ -20,10 +20,10 @@ exports.onWhatsapp = async (req, res) => {
 exports.downProfile = async (req, res) => {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
-      if (formatPhoneNumberId === null) {
+    if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000.',
+            message: 'Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000',
         });
     }
     const data = await WhatsAppInstances[req.query.key]?.DownloadProfile(
@@ -38,7 +38,7 @@ exports.getStatus = async (req, res) => {
     if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000.',
+            message: 'Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000',
         });
     }
     const data = await WhatsAppInstances[req.query.key]?.getUserStatus(
@@ -50,10 +50,10 @@ exports.getStatus = async (req, res) => {
 exports.blockUser = async (req, res) => {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
-      if (formatPhoneNumberId === null) {
+    if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000.',
+            message: 'Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000',
         });
     }
     const data = await WhatsAppInstances[req.query.key]?.blockUnblock(
@@ -73,10 +73,10 @@ exports.blockUser = async (req, res) => {
 exports.updateProfilePicture = async (req, res) => {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
-      if (formatPhoneNumberId === null) {
+    if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000.',
+            message: 'Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000',
         });
     }
     const data = await WhatsAppInstances[req.query.key].updateProfilePicture(
@@ -89,10 +89,10 @@ exports.updateProfilePicture = async (req, res) => {
 exports.getUserOrGroupById = async (req, res) => {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
-      if (formatPhoneNumberId === null) {
+    if (formatPhoneNumberId === null) {
         return res.status(429).json({
             error: true,
-            message: 'Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000.',
+            message: 'Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000',
         });
     }
     const data = await WhatsAppInstances[req.query.key].getUserOrGroupById(

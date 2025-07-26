@@ -5,11 +5,13 @@ function textErrorNumberInvalid(group) {
     if (group) {
         return "ID de grupo inválido. O identificador de grupo deve terminar com '@g.us'. Exemplo: 120003324939242500@g.us.";
     } else {
-        return "Número de telefone inválido. Envie o número completo com 13 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511990000000.";
+        return "Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000";
     }
 }
 exports.Text = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -33,7 +35,9 @@ exports.Text = async (req, res) => {
 }
 
 exports.Image = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -52,7 +56,9 @@ exports.Image = async (req, res) => {
 }
 
 exports.Video = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -71,7 +77,9 @@ exports.Video = async (req, res) => {
 }
 
 exports.Audio = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -89,7 +97,9 @@ exports.Audio = async (req, res) => {
 }
 
 exports.Document = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -109,7 +119,9 @@ exports.Document = async (req, res) => {
 }
 
 exports.Mediaurl = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -129,7 +141,9 @@ exports.Mediaurl = async (req, res) => {
 }
 
 exports.Button = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -146,7 +160,9 @@ exports.Button = async (req, res) => {
 }
 
 exports.Contact = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -163,7 +179,9 @@ exports.Contact = async (req, res) => {
 }
 
 exports.List = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {
@@ -180,7 +198,9 @@ exports.List = async (req, res) => {
 }
 
 exports.MediaButton = async (req, res) => {
-    let group = req.body?.group || false;
+    let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
     let formatPhoneNumberId = group ? req.body.id : VerifiNumberId.formatPhoneNumber(req.body.id);
 
     if (formatPhoneNumberId === null) {

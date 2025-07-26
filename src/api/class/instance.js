@@ -574,28 +574,44 @@ class WhatsAppInstance {
 
     async verifyId(id) {
 
-        if (id.includes('@g.us')) return true
-        const [result] = await this.instance.sock?.onWhatsApp(id)
-        if (result?.exists) return true
-        throw new Error('no account exists')
+        if (id.includes('@g.us')) {
+            const resultAllGroup = await this.instance.sock?.groupMetadata(id)
+            if (resultAllGroup.id) {
+                return {
+                    jid: resultAllGroup.id,
+                    exists: true,
+                    lid: '',
+                };
+            } else {
+                throw new Error('group not found');
+            }
+        } else {
+            const resultAll = await this.instance.sock?.onWhatsApp(id)
+            if (resultAll.length > 0 && resultAll[0]?.exists) return resultAll[0];
+            throw new Error('no account exists')
+        }
+
     }
 
     async sendTextMessage(to, message) {
         const formattedId = this.getWhatsAppId(to);
 
-
         try {
-            await this.verifyId(formattedId);
 
+            let resultVerifyId = await this.verifyId(formattedId);
 
             // Verificar se a sessão está estabelecida
             if (!this.instance.sock) {
                 throw new Error('Socket instance is not initialized');
             }
 
+            if (!resultVerifyId?.exists) {
+                throw new Error('id not working or not found');
+            }
+
             // Aumentar a duração do timeout para 60 segundos
             const data = await Promise.race([
-                this.instance.sock.sendMessage(formattedId, { text: message }),
+                this.instance.sock.sendMessage(resultVerifyId.jid, { text: message }),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Message sending timed out')), 60000)) // Timeout de 60 segundos
             ]);
             return data;
@@ -606,9 +622,21 @@ class WhatsAppInstance {
     }
 
     async sendMediaFile(to, file, type, caption = '', filename) {
-        await this.verifyId(this.getWhatsAppId(to))
+        const formattedId = this.getWhatsAppId(to);
+
+        let resultVerifyId = await this.verifyId(formattedId);
+
+        // Verificar se a sessão está estabelecida
+        if (!this.instance.sock) {
+            throw new Error('Socket instance is not initialized');
+        }
+
+        if (!resultVerifyId?.exists) {
+            throw new Error('id not working or not found');
+        }
+
         const data = await this.instance.sock?.sendMessage(
-            this.getWhatsAppId(to),
+            resultVerifyId.jid,
             {
                 mimetype: file.mimetype,
                 [type]: file.buffer,
