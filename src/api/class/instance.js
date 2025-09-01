@@ -79,7 +79,24 @@ class WhatsAppInstance {
         this.instance.sock = makeWASocket(this.socketConfig)
 
         this.setHandler()
+        // Listener para pegar todos os grupos assim que conectar
+        // const fetchGroups = async (update) => {
+        //     if (update.connection === 'open') {
+        //         try {
+        //             const groups = await this.instance.sock.groupFetchAllParticipating()
 
+        //             // Salvar no DB se quiser
+        //             await this.saveContactsAndGroups(Object.values(groups))
+
+        //             // Remove o listener para não disparar novamente
+        //             this.instance.sock.ev.off('connection.update', fetchGroups)
+        //         } catch (e) {
+        //             console.error("Erro ao buscar grupos:", e)
+        //         }
+        //     }
+        // }
+
+        // this.instance.sock.ev.on('connection.update', fetchGroups)
 
         return this
     }
@@ -152,6 +169,7 @@ class WhatsAppInstance {
                 if (instanceConfigWebhookConfig && ['all', 'connection', 'connection.update', 'connection:open'].some((e) => instanceConfigWebhookConfig.events.includes(e))) {
                     await this.SendWebhook('connection', { connection: connection }, this.key, instanceConfigWebhookConfig);
                 }
+
             }
 
             if (qr) {
@@ -199,6 +217,7 @@ class WhatsAppInstance {
 
         //If you only want to export all the numbers saved in your contact list, you can do it as follows:
         sock?.ev.on('contacts.upsert', async (data) => {
+            //console.log('contacts.upsert');
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -212,6 +231,10 @@ class WhatsAppInstance {
         })
         //If you want to export numbers from all your previous individual conversations, you can do it as follows:
         sock.ev.on('messaging-history.set', async (data) => {
+            // console.log(data);
+            // console.log('messaging-history.set');
+
+
             const messagingHistoryData = data.contacts;
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -435,8 +458,9 @@ class WhatsAppInstance {
         })
 
         sock?.ev.on('groups.upsert', async (newChat) => {
-            //console.log('groups.upsert')
-            //console.log(newChat)
+
+            // console.log(newChat)
+            // console.log('groups.upsert')
             this.createGroupByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -454,8 +478,8 @@ class WhatsAppInstance {
         })
 
         sock?.ev.on('groups.update', async (newChat) => {
-            //console.log('groups.update')
-            console.log(newChat)
+            // console.log(newChat)
+            // console.log('groups.update')
             this.updateGroupSubjectByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -473,8 +497,8 @@ class WhatsAppInstance {
         })
 
         sock?.ev.on('group-participants.update', async (newChat) => {
-            //console.log('group-participants.update')
             //console.log(newChat)
+            console.log('group-participants.update')
             this.updateGroupParticipantsByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -985,7 +1009,7 @@ class WhatsAppInstance {
         try {
             if (newChat[0] && newChat[0].subject) {
                 let Chats = await this.getChat();
-                console.log(Chats);
+                //console.log(Chats);
 
                 const chatToUpdate = Chats.find(c => c.id === newChat[0].id);
 
@@ -1202,13 +1226,19 @@ class WhatsAppInstance {
     async saveContactsAndGroups(arrayContactsOrGroups) {
         try {
             for (const contactGroup of arrayContactsOrGroups) {
+                //console.log(contactGroup);
+
                 if (contactGroup.id.endsWith('@g.us')) {
+                    // Filtrar grupos que tenham formato "numero-traco@g.us"
+                    if (/^\d+-\d+@g\.us$/.test(contactGroup.id)) {
+                        continue; // pula esse grupo
+                    }
 
                     // primeiro vamos verificar se o grupo já existe contactGroup.id na model Groups group_id
                     let alreadyThere = await Groups.findOne({ group_id: contactGroup.id }).exec();
-                    if (!alreadyThere && contactGroup.name) {
+                    if (!alreadyThere && contactGroup.name || contactGroup.subject) {
                         const saveGroup = new Groups({
-                            name: contactGroup.name,
+                            name: contactGroup?.name ? contactGroup.name : contactGroup.subject,
                             group_id: contactGroup.id,
                             instance: this.key
                         });
