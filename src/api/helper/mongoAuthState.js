@@ -59,18 +59,9 @@ const BufferJSON = {
 
 // Função para converter o objeto em array, se necessário
 function convertObjectToArray(obj) {
-    if (!obj || typeof obj !== 'object') {
-        console.warn('convertObjectToArray: obj is not an object', obj);
-        return [];
-    }
-
-    const keys = Object.keys(obj);
-    if (!keys.length) {
-        console.warn('convertObjectToArray: obj is empty');
-        return [];
-    }
-
-    return keys.map(k => obj[k]).filter(item => typeof item === 'object');
+    const data = obj['0'];
+    data['senderMessageKeys'] = [{}, {}]
+    return [data];
 }
 
 
