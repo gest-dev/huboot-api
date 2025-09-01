@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const Contact = mongoose.model("contacts", {
   name: {
@@ -30,4 +30,4 @@ const Contact = mongoose.model("contacts", {
   },
 });
 
-module.exports = Contact;
+export default Contact;

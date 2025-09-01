@@ -1,5 +1,5 @@
-const Joi = require("joi");
-const { messages } = require("joi-translation-pt-br");
+import Joi from "joi";
+import { messages } from "joi-translation-pt-br";
 
 const schema = Joi.object()
   .keys({
@@ -16,4 +16,4 @@ const schema = Joi.object()
     }
   );
 
-module.exports = schema;
+export default schema;

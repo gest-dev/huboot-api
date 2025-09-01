@@ -1,6 +1,6 @@
-const ContactModel = require('../models/Contacts.model')
+import ContactModel from '../models/Contacts.model.js';
 
-exports.getAllContacts = async (req, res) => {
+async function getAllContacts(req, res) {
     const instance = req.query?.key
     let data = []
     try {
@@ -14,5 +14,9 @@ exports.getAllContacts = async (req, res) => {
         message: 'Instance fetched successfully',
         instance_data: data,
     })
+}
+
+export default {
+    getAllContacts
 }
 

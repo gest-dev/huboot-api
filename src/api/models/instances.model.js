@@ -1,5 +1,4 @@
-const { string } = require("joi");
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const Instances = mongoose.model("instances", {
   name: {
@@ -33,4 +32,5 @@ const Instances = mongoose.model("instances", {
   },
 });
 
-module.exports = Instances;
+
+export default Instances;

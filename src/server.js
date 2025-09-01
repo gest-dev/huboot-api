@@ -1,22 +1,20 @@
-const dotenv = require('dotenv')
-const mongoose = require('mongoose')
-const logger = require('pino')()
-dotenv.config()
+import mongoose from 'mongoose';
+import pino from 'pino';
+import semver from 'semver';
+import app from './config/express.js';
+import config from './config/config.js';
+import Session from './api/class/session.js';
+import connectToCluster from './api/helper/connectMongoClient.js';
 
-const semver = require('semver');
+const logger = pino();
 const requiredNodeVersion = '>=20.0.0 <23.0.0';
+
 
 if (!semver.satisfies(process.version, requiredNodeVersion)) {
     console.error(`Erro: Esta aplicação requer Node.js na versão ${requiredNodeVersion}. Versão atual: ${process.version}`);
     process.exit(1);
- 
+
 }
-
-const app = require('./config/express')
-const config = require('./config/config')
-
-const { Session } = require('./api/class/session')
-const connectToCluster = require('./api/helper/connectMongoClient')
 
 let server
 
@@ -64,4 +62,5 @@ process.on('SIGTERM', () => {
     }
 })
 
-module.exports = server
+export default server;
+

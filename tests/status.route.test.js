@@ -19,7 +19,7 @@ if (protectRoutes) {
         it('should fail with bearer token is mismatch', (done) => {
             request(app)
                 .get('/status')
-                .set('Authorization', `Bearer ${process.env.TOKEN}wrong`)
+                .set('Authorization', `Bearer ${config.auth.TOKEN}wrong`)
                 .expect(403)
                 .then((res) => {
                     assert(res.body.message, 'invalid bearer token supplied')
@@ -31,7 +31,7 @@ if (protectRoutes) {
         it('should successfully when bearer token is present and matched', (done) => {
             request(app)
                 .get('/status')
-                .set('Authorization', `Bearer ${process.env.TOKEN}`)
+                .set('Authorization', `Bearer ${config.auth.TOKEN}`)
                 .expect(200)
                 .then((res) => {
                     assert(res.body, 'OK')

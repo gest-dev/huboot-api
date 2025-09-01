@@ -1,17 +1,19 @@
-const { WhatsAppInstance } = require('../class/instance')
-const fs = require('fs')
-const path = require('path')
-const config = require('../../config/config')
-const { Session } = require('../class/session')
-const schemaNewInstance = require("../schemas/new_instance.schemas");
-const Utils = require('../helper/utils')
-const AuthAccessToken = require('../class/authAccessToken')
-const Instances = require("../models/instances.model");
-const GroupsModel = require('../models/Groups.model')
-const ContactsModel = require('../models/Contacts.model')
-const InstanceConfigWebhook = require("../models/InstanceConfigWebhook.model");
+import WhatsAppInstance from '../class/instance.js';
+import fs from 'fs';
+import path from 'path';
+import config from '../../config/config.js';
+import Session from '../class/session.js';
+import schemaNewInstance from '../schemas/new_instance.schemas.js';
+import Utils from '../helper/utils.js';
+import AuthAccessToken from '../class/authAccessToken.js';
+import Instances from '../models/instances.model.js';
+import GroupsModel from '../models/Groups.model.js';
+import ContactsModel from '../models/Contacts.model.js';
+import InstanceConfigWebhook from '../models/InstanceConfigWebhook.model.js';
 
-exports.new = async (req, res) => {
+
+async function newInstance(req, res) {
+
     try {
         const { error, value } = schemaNewInstance.validate(req.body, {
             abortEarly: false,
@@ -86,7 +88,7 @@ exports.new = async (req, res) => {
     }
 
 }
-exports.list = async (req, res) => {
+async function list(req, res) {
 
     // if (req.query.active) {
     //     let instance = []
@@ -131,7 +133,8 @@ exports.list = async (req, res) => {
     })
 }
 
-exports.init = async (req, res) => {
+async function init(req, res) {
+
     const key = req.query.key
     let InstanceInfo = await Instances.findOne({ key: key });
     if (!InstanceInfo) {
@@ -176,7 +179,7 @@ exports.init = async (req, res) => {
     })
 }
 
-exports.qr = async (req, res) => {
+async function qr(req, res) {
     try {
         const qrcode = await WhatsAppInstances[req.query.key]?.instance.qr
         res.render('qrcode', {
@@ -189,7 +192,7 @@ exports.qr = async (req, res) => {
     }
 }
 
-exports.qrbase64 = async (req, res) => {
+async function qrbase64(req, res) {
     try {
         const key = req.query.key
         let InstanceInfo = await Instances.findOne({ key: key });
@@ -219,7 +222,7 @@ exports.qrbase64 = async (req, res) => {
     }
 }
 
-exports.info = async (req, res) => {
+async function info(req, res) {
     const key = req.query.key
     let InstanceInfo = await Instances.findOne({ key: key });
     if (!InstanceInfo) {
@@ -252,7 +255,7 @@ exports.info = async (req, res) => {
     })
 }
 
-exports.restoreAll = async (req, res, next) => {
+async function restoreAll(req, res, next) {
     try {
         const session = new Session()
         let restoredSessions = await session.restoreSessions()
@@ -266,7 +269,7 @@ exports.restoreAll = async (req, res, next) => {
     }
 }
 
-exports.restore = async (req, res, next) => {
+async function restore(req, res, next) {
     try {
         const key = req.query.key
         let InstanceInfo = await Instances.findOne({ key: key });
@@ -288,7 +291,7 @@ exports.restore = async (req, res, next) => {
     }
 }
 
-exports.logout = async (req, res) => {
+async function logout(req, res, next) {
     let errormsg
     const key = req.query.key
     try {
@@ -303,7 +306,7 @@ exports.logout = async (req, res) => {
     })
 }
 
-exports.delete = async (req, res) => {
+async function deleteInstance(req, res, next) {
     let errormsg
     try {
         await WhatsAppInstances[req.query.key].deleteInstance(req.query.key)
@@ -318,7 +321,7 @@ exports.delete = async (req, res) => {
     })
 }
 
-exports.deleteGeneral = async (req, res) => {
+async function deleteGeneral(req, res) {
 
     const key = req.query.key
     let InstanceInfo = await Instances.findOne({ key: key });
@@ -367,7 +370,7 @@ exports.deleteGeneral = async (req, res) => {
     })
 }
 
-exports.status = async (req, res) => {
+async function status(req, res) {
     const key = req.query.key
     let InstanceInfo = await Instances.findOne({ key: key });
     if (!InstanceInfo) {
@@ -397,3 +400,19 @@ exports.status = async (req, res) => {
         instance_data: InstanceInfoWp,
     })
 }
+
+
+export default {
+    newInstance,
+    list,
+    init,
+    qr,
+    qrbase64,
+    info,
+    restoreAll,
+    restore,
+    logout,
+    deleteInstance,
+    deleteGeneral,
+    status
+};

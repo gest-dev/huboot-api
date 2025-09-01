@@ -1,11 +1,12 @@
-const express = require('express');
-const path = require('path');
-const exceptionHandler = require('express-exception-handler');
-const session = require('express-session');
-const flash = require('connect-flash');
-const cookieParser = require('cookie-parser'); // Para gerenciar cookies
-const error = require('../api/middlewares/error');
-const bcrypt = require('bcryptjs');
+import express from 'express';
+import path from 'path';
+import exceptionHandler from 'express-exception-handler';
+import session from 'express-session';
+import flash from 'connect-flash';
+import cookieParser from 'cookie-parser'; // Para gerenciar cookies
+import error from '../api/middlewares/error.js';
+import bcrypt from 'bcryptjs';
+import routes from '../api/routes/index.js'; // Certifique-se da extensão .js
 
 // Inicializar o app
 const app = express();
@@ -25,8 +26,7 @@ app.use(express.static('src/public'));
 
 // Configurar EJS como motor de visualização
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '../views'));
-
+app.set('views', path.join(path.resolve(), 'views'));
 
 // Configurar sessões
 app.use(
@@ -51,13 +51,11 @@ app.use((req, res, next) => {
 global.WhatsAppInstances = {};
 
 // Importar rotas
-const routes = require('../api/routes/');
 app.use('/', routes);
 
 // Middleware para tratar erros (personalizado)
 app.use(error.handler);
-
 app.use(error.notFound);
 
 // Exportar o app
-module.exports = app;
+export default app;

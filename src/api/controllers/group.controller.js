@@ -1,6 +1,6 @@
-const GroupsModel = require('../models/Groups.model')
+import GroupsModel from '../models/Groups.model.js';
 
-exports.create = async (req, res) => {
+async function create(req, res) {
     const data = await WhatsAppInstances[req.query.key].createNewGroup(
         req.body.name,
         req.body.users
@@ -8,7 +8,8 @@ exports.create = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.addNewParticipant = async (req, res) => {
+async function addNewParticipant(req, res) {
+
     const data = await WhatsAppInstances[req.query.key].addNewParticipant(
         req.body.id,
         req.body.users
@@ -16,7 +17,7 @@ exports.addNewParticipant = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.makeAdmin = async (req, res) => {
+async function makeAdmin(req, res) {
     const data = await WhatsAppInstances[req.query.key].makeAdmin(
         req.body.id,
         req.body.users
@@ -24,7 +25,7 @@ exports.makeAdmin = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.demoteAdmin = async (req, res) => {
+async function demoteAdmin(req, res) {
     const data = await WhatsAppInstances[req.query.key].demoteAdmin(
         req.body.id,
         req.body.users
@@ -32,19 +33,19 @@ exports.demoteAdmin = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.listAll = async (req, res) => {
+async function listAll(req, res) {
     const data = await WhatsAppInstances[req.query.key].getAllGroups(
         req.query.key
     )
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.leaveGroup = async (req, res) => {
+async function leaveGroup(req, res) {
     const data = await WhatsAppInstances[req.query.key].leaveGroup(req.query.id)
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.getInviteCodeGroup = async (req, res) => {
+async function getInviteCodeGroup(req, res) {
     const data = await WhatsAppInstances[req.query.key].getInviteCodeGroup(
         req.query.id
     )
@@ -53,7 +54,7 @@ exports.getInviteCodeGroup = async (req, res) => {
         .json({ error: false, link: 'https://chat.whatsapp.com/' + data })
 }
 
-exports.getInstanceInviteCodeGroup = async (req, res) => {
+async function getInstanceInviteCodeGroup(req, res) {
     const data = await WhatsAppInstances[
         req.query.key
     ].getInstanceInviteCodeGroup(req.query.id)
@@ -62,7 +63,7 @@ exports.getInstanceInviteCodeGroup = async (req, res) => {
         .json({ error: false, link: 'https://chat.whatsapp.com/' + data })
 }
 
-exports.getAllGroups = async (req, res) => {
+async function getAllGroups(req, res) {
     const instance = WhatsAppInstances[req.query.key]
     let data
     try {
@@ -77,7 +78,7 @@ exports.getAllGroups = async (req, res) => {
     })
 }
 
-exports.getAllGroupsDatabase = async (req, res) => {
+async function getAllGroupsDatabase(req, res) {
     const instance = req.query?.key
     let data = []
     try {
@@ -92,9 +93,7 @@ exports.getAllGroupsDatabase = async (req, res) => {
     })
 }
 
-
-
-exports.groupParticipantsUpdate = async (req, res) => {
+async function groupParticipantsUpdate(req, res) {
     const data = await WhatsAppInstances[req.query.key].groupParticipantsUpdate(
         req.body.id,
         req.body.users,
@@ -103,7 +102,7 @@ exports.groupParticipantsUpdate = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.groupSettingUpdate = async (req, res) => {
+async function groupSettingUpdate(req, res) {
     const data = await WhatsAppInstances[req.query.key].groupSettingUpdate(
         req.body.id,
         req.body.action
@@ -111,7 +110,7 @@ exports.groupSettingUpdate = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.groupUpdateSubject = async (req, res) => {
+async function groupUpdateSubject(req, res) {
     const data = await WhatsAppInstances[req.query.key].groupUpdateSubject(
         req.body.id,
         req.body.subject
@@ -119,7 +118,7 @@ exports.groupUpdateSubject = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.groupUpdateDescription = async (req, res) => {
+async function groupUpdateDescription(req, res) {
     const data = await WhatsAppInstances[req.query.key].groupUpdateDescription(
         req.body.id,
         req.body.description
@@ -127,16 +126,35 @@ exports.groupUpdateDescription = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.groupInviteInfo = async (req, res) => {
+async function groupInviteInfo(req, res) {
     const data = await WhatsAppInstances[req.query.key].groupGetInviteInfo(
         req.body.code
     )
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.groupJoin = async (req, res) => {
+async function groupJoin(req, res) {
     const data = await WhatsAppInstances[req.query.key].groupAcceptInvite(
         req.body.code
     )
     return res.status(201).json({ error: false, data: data })
+}
+
+export default {
+    create,
+    addNewParticipant,
+    makeAdmin,
+    demoteAdmin,
+    listAll,
+    leaveGroup,
+    getInviteCodeGroup,
+    getInstanceInviteCodeGroup,
+    getAllGroups,
+    getAllGroupsDatabase,
+    groupParticipantsUpdate,
+    groupSettingUpdate,
+    groupUpdateSubject,
+    groupUpdateDescription,
+    groupInviteInfo,
+    groupJoin
 }

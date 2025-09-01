@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const InvalidToken = mongoose.model("InvalidToken", {
   token: {
@@ -14,4 +14,4 @@ const InvalidToken = mongoose.model("InvalidToken", {
   },
 });
 
-module.exports = InvalidToken;
+export default InvalidToken;

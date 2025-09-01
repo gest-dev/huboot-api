@@ -1,6 +1,6 @@
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys')
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
 
-module.exports = async function downloadMessage(msg, msgType) {
+export default async function downloadMessage(msg, msgType) {
     let buffer = Buffer.from([])
     try {
         const stream = await downloadContentFromMessage(msg, msgType)

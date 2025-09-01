@@ -1,9 +1,9 @@
-const express = require('express')
-const controller = require('../controllers/contact.controller')
+import express from 'express';
+import controller from '../controllers/contact.controller.js';
+import { ChechTokenKeyInstance } from '../middlewares/ChechTokenKeyInstance.js';
 
-const { ChechTokenKeyInstance } = require("../middlewares/ChechTokenKeyInstance");
-const router = express.Router()
+const router = express.Router();
 
-router.route('/all').get(ChechTokenKeyInstance, controller.getAllContacts)
+router.route('/all').get(ChechTokenKeyInstance, controller.getAllContacts);
 
-module.exports = router
+export default router;

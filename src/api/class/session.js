@@ -1,8 +1,9 @@
-/* eslint-disable no-unsafe-optional-chaining */
-const { WhatsAppInstance } = require('../class/instance')
-const logger = require('pino')()
-const config = require('../../config/config')
-const Instances = require("../models/instances.model");
+import WhatsAppInstance from '../class/instance.js';
+import pino from 'pino';
+const logger = pino();
+import config from '../../config/config.js';
+import Instances from '../models/instances.model.js';
+
 class Session {
     async restoreSessions(keyNames = []) {
         console.log('opening mongo connection restoreSessions')
@@ -46,4 +47,4 @@ class Session {
     }
 }
 
-exports.Session = Session
+export default Session;

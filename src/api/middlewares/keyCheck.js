@@ -1,25 +1,23 @@
-const Instances = require('../models/instances.model')
+import Instances from '../models/instances.model.js';
 
-async function keyVerification(req, res, next) {
-    const key = req.query['key']?.toString()
+export default async function keyVerification(req, res, next) {
+    const key = req.query['key']?.toString();
+
     if (!key) {
-        return res
-            .status(403)
-            .send({ error: true, message: 'no key query was present' })
+        return res.status(403).json({ error: true, message: 'no key query was present' });
     }
-    let InstanceInfo = await Instances.findOne({ key: key });
-    if (!InstanceInfo) {
-        return res
-            .status(403)
-            .send({ error: true, message: 'invalid key supplied DB' })
-    }
-    const instance = WhatsAppInstances[key]
-    if (!instance) {
-        return res
-            .status(403)
-            .send({ error: true, message: 'invalid key supplied Session' })
-    }
-    next()
-}
 
-module.exports = keyVerification
+    const InstanceInfo = await Instances.findOne({ key });
+
+    if (!InstanceInfo) {
+        return res.status(403).json({ error: true, message: 'invalid key supplied DB' });
+    }
+
+    const instance = global.WhatsAppInstances[key]; // Assumindo que WhatsAppInstances é global
+
+    if (!instance) {
+        return res.status(403).json({ error: true, message: 'invalid key supplied Session' });
+    }
+
+    next();
+}

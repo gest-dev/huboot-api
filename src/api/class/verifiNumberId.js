@@ -1,5 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
-
 class VerifiNumberId {
     static formatPhoneNumber(phoneNumber) {
         // Remove qualquer caractere que não seja número
@@ -74,4 +72,4 @@ class VerifiNumberId {
 
 }
 
-exports.VerifiNumberId = VerifiNumberId
+export default VerifiNumberId;

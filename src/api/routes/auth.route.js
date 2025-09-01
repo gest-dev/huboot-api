@@ -1,12 +1,13 @@
-const express = require('express')
-const controller = require('../controllers/auth.controller')
-const { checkToken } = require("../middlewares/ChechToken");
+import express from 'express';
+import controller from '../controllers/auth.controller.js';
+import { checkToken } from '../middlewares/ChechToken.js';
 
-const router = express.Router()
+const router = express.Router();
+
 // Rota para exibir a página de login
 router.get('/', checkToken, (req, res) => {
   res.json({ message: 'OK' });
-})
+});
 
 // Rota para processar o login
 router.route('/login').get(controller.loginIndex);
@@ -17,5 +18,4 @@ router.route('/logout').delete(checkToken, controller.logout);
 router.route('/register').get(controller.registerIndex);
 router.route('/register').post(controller.register);
 
-
-module.exports = router
+export default router;

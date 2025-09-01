@@ -1,24 +1,22 @@
-const InstanceConfigWebhook = require("../models/InstanceConfigWebhook.model");
-const QRCode = require('qrcode')
-const pino = require('pino')
-const {
-    default: makeWASocket,
-    DisconnectReason,
-} = require('@whiskeysockets/baileys')
-const { unlinkSync } = require('fs')
-const { v4: uuidv4 } = require('uuid')
-const path = require('path')
-const processButton = require('../helper/processbtn')
-const generateVC = require('../helper/genVc')
-const Chat = require('../models/chat.model')
-const axios = require('axios')
-const config = require('../../config/config')
-const downloadMessage = require('../helper/downloadMsg')
-const logger = require('pino')()
-const useMongoDBAuthState = require('../helper/mongoAuthState')
-const Contacts = require('../models/Contacts.model')
-const Groups = require('../models/Groups.model')
-const InstancesModel = require("../models/instances.model");
+import InstanceConfigWebhook from "../models/InstanceConfigWebhook.model.js";
+import QRCode from "qrcode";
+import pino from "pino";
+import makeWASocket, { DisconnectReason } from "@whiskeysockets/baileys";
+import { unlinkSync } from "fs";
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
+import processButton from "../helper/processbtn.js";
+import generateVC from "../helper/genVc.js";
+import Chat from "../models/chat.model.js";
+import axios from "axios";
+import config from "../../config/config.js";
+import downloadMessage from "../helper/downloadMsg.js";
+const logger = pino();
+import useMongoDBAuthState from "../helper/mongoAuthState.js";
+import Contacts from "../models/Contacts.model.js";
+import Groups from "../models/Groups.model.js";
+import InstancesModel from "../models/instances.model.js";
+
 
 
 class WhatsAppInstance {
@@ -457,7 +455,7 @@ class WhatsAppInstance {
 
         sock?.ev.on('groups.update', async (newChat) => {
             //console.log('groups.update')
-            //console.log(newChat)
+            console.log(newChat)
             this.updateGroupSubjectByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -794,7 +792,7 @@ class WhatsAppInstance {
     async getUserOrGroupById(id) {
         try {
             let Chats = await this.getChat()
-            console.log(Chats)
+            //console.log(Chats)
             const group = Chats.find((c) => c.id === this.getWhatsAppId(id))
             if (!group)
                 throw new Error(
@@ -984,19 +982,26 @@ class WhatsAppInstance {
     }
 
     async updateGroupSubjectByApp(newChat) {
-        //console.log(newChat)
         try {
             if (newChat[0] && newChat[0].subject) {
-                let Chats = await this.getChat()
-                Chats.find((c) => c.id === newChat[0].id).name =
-                    newChat[0].subject
-                await this.updateDb(Chats)
+                let Chats = await this.getChat();
+                console.log(Chats);
+
+                const chatToUpdate = Chats.find(c => c.id === newChat[0].id);
+
+                if (chatToUpdate) {
+                    chatToUpdate.name = newChat[0].subject;
+                    await this.updateDb(Chats);
+                } else {
+                    logger.warn(`Chat with id ${newChat[0].id} not found`);
+                }
             }
         } catch (e) {
-            logger.error(e)
-            logger.error('Error updating document failed')
+            logger.error(e);
+            logger.error('Error updating document failed');
         }
     }
+
 
     async updateGroupParticipantsByApp(newChat) {
         //console.log(newChat)
@@ -1233,4 +1238,4 @@ class WhatsAppInstance {
 
 }
 
-exports.WhatsAppInstance = WhatsAppInstance
+export default WhatsAppInstance;

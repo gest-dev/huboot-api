@@ -1,12 +1,10 @@
-const { proto } = require('@whiskeysockets/baileys/WAProto')
-const {
-    Curve,
-    signedKeyPair,
-} = require('@whiskeysockets/baileys/lib/Utils/crypto')
-const {
-    generateRegistrationId,
-} = require('@whiskeysockets/baileys/lib/Utils/generics')
-const { randomBytes } = require('crypto')
+
+import { proto } from '@whiskeysockets/baileys/WAProto/index.js';
+
+import { Curve, signedKeyPair } from '@whiskeysockets/baileys/lib/Utils/crypto.js';
+import { generateRegistrationId } from '@whiskeysockets/baileys/lib/Utils/generics.js';
+import { randomBytes } from 'crypto';
+
 
 const initAuthCreds = () => {
     const identityKey = Curve.generateKeyPair()
@@ -61,12 +59,22 @@ const BufferJSON = {
 
 // Função para converter o objeto em array, se necessário
 function convertObjectToArray(obj) {
-    const data = obj['0'];
-    data['senderMessageKeys'] = [ {}, {} ]
-    return [data];
+    if (!obj || typeof obj !== 'object') {
+        console.warn('convertObjectToArray: obj is not an object', obj);
+        return [];
+    }
+
+    const keys = Object.keys(obj);
+    if (!keys.length) {
+        console.warn('convertObjectToArray: obj is empty');
+        return [];
+    }
+
+    return keys.map(k => obj[k]).filter(item => typeof item === 'object');
 }
 
-module.exports = useMongoDBAuthState = async (collection) => {
+
+const useMongoDBAuthState = async (collection) => {
     const writeData = (data, id) => {
         if (Array.isArray(data)) {
             const obj = {};
@@ -97,22 +105,22 @@ module.exports = useMongoDBAuthState = async (collection) => {
     }
     const creds = (await readData('creds')) || (0, initAuthCreds)()
 
-                    
+
     return {
         state: {
             creds,
             keys: {
                 get: async (type, ids) => {
-                           const data = {}
+                    const data = {}
                     await Promise.all(
                         ids.map(async (id) => {
                             let value = await readData(`${type}-${id}`)
-                  
+
                             if (type === 'sender-key' && value) {
                                 if (typeof value === 'object') {
                                     let convertedKey = convertObjectToArray(value);
-                                    value = convertedKey;                          
-                                } 
+                                    value = convertedKey;
+                                }
                             }
 
                             if (type === 'app-state-sync-key') {
@@ -127,10 +135,10 @@ module.exports = useMongoDBAuthState = async (collection) => {
                     return data
                 },
                 set: async (data) => {
-        
+
                     const tasks = []
                     for (const category of Object.keys(data)) {
-                 
+
                         for (const id of Object.keys(data[category])) {
                             const value = data[category][id]
                             const key = `${category}-${id}`
@@ -148,3 +156,5 @@ module.exports = useMongoDBAuthState = async (collection) => {
         },
     }
 }
+
+export default useMongoDBAuthState;

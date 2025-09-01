@@ -1,5 +1,5 @@
-const Joi = require("joi");
-const { messages } = require("joi-translation-pt-br");
+import Joi from "joi";
+import { messages } from "joi-translation-pt-br";
 
 const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
@@ -36,6 +36,7 @@ const schema = Joi.object()
         },
       },
     }
-  ).with("password", "passwordConfirm");
+  )
+  .with("password", "passwordConfirm");
 
-module.exports = schema;
+export default schema;

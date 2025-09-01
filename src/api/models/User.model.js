@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const User = mongoose.model("users", {
   fullname: {
@@ -31,4 +31,4 @@ const User = mongoose.model("users", {
   },
 });
 
-module.exports = User;
+export default User;

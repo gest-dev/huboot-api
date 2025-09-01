@@ -1,12 +1,11 @@
-// module imports
-const InstancesModel = require("../models/instances.model");
-const GroupsModel = require('../models/Groups.model')
-const ContactsModel = require('../models/Contacts.model')
-const InstanceConfigWebhook = require("../models/InstanceConfigWebhook.model");
-const config = require("../../config/config");
-const schemaInstanceEventsWebhookEdit = require("../schemas/instance_events_webhook_edit.schemas");
+import InstancesModel from "../models/instances.model.js";
+import GroupsModel from "../models/Groups.model.js";
+import ContactsModel from "../models/Contacts.model.js";
+import InstanceConfigWebhook from "../models/InstanceConfigWebhook.model.js";
+import config from "../../config/config.js";
+import schemaInstanceEventsWebhookEdit from "../schemas/instance_events_webhook_edit.schemas.js";
 
-exports.instanceIndex = async (req, res) => {
+async function instanceIndex(req, res) {
 
   let key = req.params.key;
   let InstanceInfo = await InstancesModel.findOne({ key: key });
@@ -57,8 +56,7 @@ exports.instanceIndex = async (req, res) => {
   );
 }
 
-//WebSocke
-exports.instanceEventsWebSocketIndex = async (req, res) => {
+async function instanceEventsWebSocketIndex(req, res) {
 
   let key = req.params.key;
   let InstanceInfo = await InstancesModel.findOne({ key: key });
@@ -106,7 +104,7 @@ exports.instanceEventsWebSocketIndex = async (req, res) => {
 }
 
 //webhook
-exports.instanceEventsWebhookIndex = async (req, res) => {
+async function instanceEventsWebhookIndex(req, res) {
 
   let key = req.params.key;
   let InstanceInfo = await InstancesModel.findOne({ key: key });
@@ -130,8 +128,7 @@ exports.instanceEventsWebhookIndex = async (req, res) => {
   });
 }
 
-//instanceEventsWebhookEditIndex
-exports.instanceEventsWebhookEdit = async (req, res) => {
+async function instanceEventsWebhookEdit(req, res) {
 
   try {
 
@@ -192,3 +189,9 @@ exports.instanceEventsWebhookEdit = async (req, res) => {
   }
 
 }
+export default {
+  instanceIndex,
+  instanceEventsWebSocketIndex,
+  instanceEventsWebhookIndex,
+  instanceEventsWebhookEdit
+};

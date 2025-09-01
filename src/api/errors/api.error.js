@@ -1,4 +1,4 @@
-const ExtendableError = require('../errors/extendable.error')
+import ExtendableError from '../errors/extendable.error.js';
 
 class APIError extends ExtendableError {
     constructor({ message, errors, status = 500 }) {
@@ -10,4 +10,4 @@ class APIError extends ExtendableError {
     }
 }
 
-module.exports = APIError
+export default APIError;
