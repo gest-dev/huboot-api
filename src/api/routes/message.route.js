@@ -18,6 +18,7 @@ router.route('/doc').post(ChechTokenKeyInstance, keyVerify, loginVerify, upload,
 router.route('/mediaurl').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.Mediaurl)
 router.route('/button').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.Button)
 router.route('/contact').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.Contact)
+router.route('/poll').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.Poll)
 router.route('/list').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.List)
 router
     .route('/mediabutton')
