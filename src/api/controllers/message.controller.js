@@ -198,6 +198,38 @@ async function List(req, res) {
     return res.status(201).json({ error: false, data: data })
 }
 
+async function Poll(req, res) {
+    let group = true;// so funciona em grupos
+    let name = req.body?.name;
+    let values = req.body?.values;
+    let selectableCount = req.body?.selectableCount;
+
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
+
+    if (name === null || values === null || selectableCount === null) {
+        return res.status(429).json({
+            error: true,
+            message: 'name, values and selectableCount are required',
+        });
+    }
+    if (formatPhoneNumberId === null) {
+        return res.status(429).json({
+            error: true,
+            message: textErrorNumberInvalid(group),
+        });
+    }
+    const data = await WhatsAppInstances[req.query.key].sendPollMessage(
+        formatPhoneNumberId, {
+        poll: {
+            name: name,
+            values: values,
+            selectableCount: selectableCount
+        }
+    }
+    )
+    return res.status(201).json({ error: false, data: data })
+}
+
 async function MediaButton(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
@@ -260,6 +292,7 @@ export default {
     Button,
     Contact,
     List,
+    Poll,
     MediaButton,
     SetStatus,
     Read,

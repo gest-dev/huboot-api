@@ -767,6 +767,18 @@ class WhatsAppInstance {
         return result
     }
 
+    async sendPollMessage(to, data) {
+        await this.verifyId(this.getWhatsAppId(to))
+        const result = await this.instance.sock?.sendMessage(
+            this.getWhatsAppId(to),
+            {
+                poll: data.poll
+            }
+        )
+
+        return result
+    }
+
     async sendMediaButtonMessage(to, data) {
         await this.verifyId(this.getWhatsAppId(to))
 

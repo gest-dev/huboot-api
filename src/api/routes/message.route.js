@@ -19,6 +19,7 @@ router.route('/mediaurl').post(ChechTokenKeyInstance, keyVerify, loginVerify, co
 router.route('/button').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.Button);
 router.route('/contact').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.Contact);
 router.route('/list').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.List);
+router.route('/poll').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.Poll);
 router.route('/mediabutton').post(ChechTokenKeyInstance, keyVerify, loginVerify, countSendMsg, controller.MediaButton);
 
 router.route('/setstatus').put(ChechTokenKeyInstance, keyVerify, loginVerify, controller.SetStatus);
