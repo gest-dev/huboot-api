@@ -2,6 +2,7 @@ import InstanceConfigWebhook from "../models/InstanceConfigWebhook.model.js";
 import QRCode from "qrcode";
 import pino from "pino";
 import makeWASocket, { DisconnectReason } from "@whiskeysockets/baileys";
+
 import { unlinkSync } from "fs";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
@@ -38,8 +39,6 @@ class WhatsAppInstance {
         qrRetry: 0,
     }
 
-
-
     constructor(key) {
         this.key = key ? key : uuidv4()
 
@@ -70,23 +69,29 @@ class WhatsAppInstance {
             })
     }
 
+
     async init() {
+
         this.collection = mongoClient.db(config.mongoose.dbName).collection(this.key)
         const { state, saveCreds } = await useMongoDBAuthState(this.collection)
         this.authState = { state: state, saveCreds: saveCreds }
         this.socketConfig.auth = this.authState.state
         this.socketConfig.browser = Object.values(config.browser)
+
         this.instance.sock = makeWASocket(this.socketConfig)
+
 
         this.setHandler()
         // Listener para pegar todos os grupos assim que conectar
         const fetchGroups = async (update) => {
             if (update.connection === 'open') {
                 try {
+                    // Buscar grupos
                     const groups = await this.instance.sock.groupFetchAllParticipating()
-
-                    // Salvar no DB se quiser
                     await this.saveContactsOrdGroups(Object.values(groups))
+
+                    // Buscar contatos bloqueados
+                    //const contactsBlocks = await this.instance.sock.fetchBlocklist()
 
                     // Remove o listener para não disparar novamente
                     this.instance.sock.ev.off('connection.update', fetchGroups)
@@ -190,6 +195,8 @@ class WhatsAppInstance {
             }
         });
 
+
+
         // sending presence
         sock?.ev.on('presence.update', async (json) => {
             console.log('presence.update');
@@ -207,7 +214,8 @@ class WhatsAppInstance {
 
         // contacts update
         sock?.ev.on('contacts.update', async (json) => {
-            console.log('contacts.update');
+
+            console.log('contacts.update', json);
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -221,7 +229,7 @@ class WhatsAppInstance {
 
         //If you only want to export all the numbers saved in your contact list, you can do it as follows:
         sock?.ev.on('contacts.upsert', async (data) => {
-            console.log('contacts.upsert');
+            console.log('contacts.upsert', data);
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -233,6 +241,7 @@ class WhatsAppInstance {
             }
 
         })
+
         //If you want to export numbers from all your previous individual conversations, you can do it as follows:
         sock.ev.on('messaging-history.set', async (data) => {
             // console.log(data);
@@ -1245,7 +1254,7 @@ class WhatsAppInstance {
             for (const contactOrGroup of arrayContactsOrGroups) {
                 //console.log(contactOrGroup);
 
-                if (contactOrGroup.id.endsWith('@g.us')) {
+                if (contactOrGroup.id && contactOrGroup.id.endsWith('@g.us')) {
                     // Filtrar grupos que tenham formato "numero-traco@g.us"
                     if (/^\d+-\d+@g\.us$/.test(contactOrGroup.id)) {
                         continue; // pula esse grupo
@@ -1265,7 +1274,7 @@ class WhatsAppInstance {
                         await Groups.updateOne({ group_id: contactOrGroup.id }, { name: contactOrGroup?.name ? contactOrGroup.name : contactOrGroup.subject });
                     }
 
-                } else if (contactOrGroup.id.endsWith('@s.whatsapp.net')) {
+                } else if (contactOrGroup.id && contactOrGroup.id.endsWith('@s.whatsapp.net')) {
                     // primeiro vamos verificar se o contato já existe contactOrGroup.id na model Contacts phone_id
                     let alreadyThere = await Contacts.findOne({ phone_id: contactOrGroup.id }).exec();
                     if (!alreadyThere && (contactOrGroup.name || contactOrGroup.notify)) {
