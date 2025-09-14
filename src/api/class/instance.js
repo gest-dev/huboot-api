@@ -109,6 +109,8 @@ class WhatsAppInstance {
 
         // on socket closed, opened, connecting
         sock?.ev.on('connection.update', async (update) => {
+            console.log('connection.update');
+
             const { connection, lastDisconnect, qr } = update;
 
             //console.log(`Connection update: ${connection}`);
@@ -190,6 +192,7 @@ class WhatsAppInstance {
 
         // sending presence
         sock?.ev.on('presence.update', async (json) => {
+            console.log('presence.update');
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -204,6 +207,7 @@ class WhatsAppInstance {
 
         // contacts update
         sock?.ev.on('contacts.update', async (json) => {
+            console.log('contacts.update');
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -217,7 +221,7 @@ class WhatsAppInstance {
 
         //If you only want to export all the numbers saved in your contact list, you can do it as follows:
         sock?.ev.on('contacts.upsert', async (data) => {
-            //console.log('contacts.upsert');
+            console.log('contacts.upsert');
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -232,7 +236,7 @@ class WhatsAppInstance {
         //If you want to export numbers from all your previous individual conversations, you can do it as follows:
         sock.ev.on('messaging-history.set', async (data) => {
             // console.log(data);
-            // console.log('messaging-history.set');
+            console.log('messaging-history.set');
 
 
             const messagingHistoryData = data.contacts;
@@ -255,6 +259,8 @@ class WhatsAppInstance {
 
         // on receive all chats
         sock?.ev.on('chats.set', async ({ chats }) => {
+            console.log('chats.set');
+
             this.instance.chats = []
             const recivedChats = chats.map((chat) => {
                 return {
@@ -269,7 +275,7 @@ class WhatsAppInstance {
 
         // on recive new chat
         sock?.ev.on('chats.upsert', (newChat) => {
-            // console.log('chats.upsert')
+            console.log('chats.upsert')
             // console.log(newChat)
             const chats = newChat.map((chat) => {
                 return {
@@ -282,8 +288,7 @@ class WhatsAppInstance {
 
         // on chat change
         sock?.ev.on('chats.update', (changedChat) => {
-            //console.log('chats.update')
-            //console.log(changedChat)
+            console.log('chats.update')
             changedChat.map((chat) => {
                 const index = this.instance.chats.findIndex(
                     (pc) => pc.id === chat.id
@@ -298,7 +303,7 @@ class WhatsAppInstance {
 
         // on chat delete
         sock?.ev.on('chats.delete', (deletedChats) => {
-            //console.log('chats.delete')
+            console.log('chats.delete')
             //console.log(deletedChats)
             deletedChats.map((chat) => {
                 const index = this.instance.chats.findIndex(
@@ -310,13 +315,11 @@ class WhatsAppInstance {
 
         // on new mssage
         sock?.ev.on('messages.upsert', async (m) => {
-
-            //console.log(m)
+            console.log('messages.upsert')
             if (m.type === 'prepend')
                 this.instance.messages.unshift(...m.messages)
             if (m.type !== 'notify') return
 
-            // https://adiwajshing.github.io/Baileys/#reading-messages
             if (config.markMessagesRead) {
                 const unreadMessages = m.messages.map((msg) => {
                     return {
@@ -404,10 +407,12 @@ class WhatsAppInstance {
         })
 
         sock?.ev.on('messages.update', async (messages) => {
-            //console.log('entrou no on messages.update')
+            console.log('messages.update')
             //console.dir(messages);
         })
         sock?.ws.on('CB:call', async (data) => {
+            console.log('CB:call');
+
             if (data.content) {
                 if (data.content.find((e) => e.tag === 'offer')) {
                     const content = data.content.find((e) => e.tag === 'offer')
@@ -460,7 +465,7 @@ class WhatsAppInstance {
         sock?.ev.on('groups.upsert', async (newChat) => {
 
             // console.log(newChat)
-            // console.log('groups.upsert')
+            console.log('groups.upsert')
             this.createGroupByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -479,7 +484,7 @@ class WhatsAppInstance {
 
         sock?.ev.on('groups.update', async (newChat) => {
             // console.log(newChat)
-            // console.log('groups.update')
+            console.log('groups.update')
             this.updateGroupSubjectByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
