@@ -80,23 +80,23 @@ class WhatsAppInstance {
 
         this.setHandler()
         // Listener para pegar todos os grupos assim que conectar
-        // const fetchGroups = async (update) => {
-        //     if (update.connection === 'open') {
-        //         try {
-        //             const groups = await this.instance.sock.groupFetchAllParticipating()
+        const fetchGroups = async (update) => {
+            if (update.connection === 'open') {
+                try {
+                    const groups = await this.instance.sock.groupFetchAllParticipating()
 
-        //             // Salvar no DB se quiser
-        //             await this.saveContactsAndGroups(Object.values(groups))
+                    // Salvar no DB se quiser
+                    await this.saveContactsOrdGroups(Object.values(groups))
 
-        //             // Remove o listener para não disparar novamente
-        //             this.instance.sock.ev.off('connection.update', fetchGroups)
-        //         } catch (e) {
-        //             console.error("Erro ao buscar grupos:", e)
-        //         }
-        //     }
-        // }
+                    // Remove o listener para não disparar novamente
+                    this.instance.sock.ev.off('connection.update', fetchGroups)
+                } catch (e) {
+                    console.error("Erro ao buscar grupos:", e)
+                }
+            }
+        }
 
-        // this.instance.sock.ev.on('connection.update', fetchGroups)
+        this.instance.sock.ev.on('connection.update', fetchGroups)
 
         return this
     }
@@ -252,7 +252,7 @@ class WhatsAppInstance {
                 await this.SendWebhook('contacts', filteredContacts, this.key, instanceConfigWebhookConfig);
             }
 
-            this.saveContactsAndGroups(messagingHistoryData);
+            this.saveContactsOrdGroups(messagingHistoryData);
 
         });
 
@@ -1240,36 +1240,39 @@ class WhatsAppInstance {
     }
 
     /* contacts and group save database instance */
-    async saveContactsAndGroups(arrayContactsOrGroups) {
+    async saveContactsOrdGroups(arrayContactsOrGroups) {
         try {
-            for (const contactGroup of arrayContactsOrGroups) {
-                //console.log(contactGroup);
+            for (const contactOrGroup of arrayContactsOrGroups) {
+                //console.log(contactOrGroup);
 
-                if (contactGroup.id.endsWith('@g.us')) {
+                if (contactOrGroup.id.endsWith('@g.us')) {
                     // Filtrar grupos que tenham formato "numero-traco@g.us"
-                    if (/^\d+-\d+@g\.us$/.test(contactGroup.id)) {
+                    if (/^\d+-\d+@g\.us$/.test(contactOrGroup.id)) {
                         continue; // pula esse grupo
                     }
 
-                    // primeiro vamos verificar se o grupo já existe contactGroup.id na model Groups group_id
-                    let alreadyThere = await Groups.findOne({ group_id: contactGroup.id }).exec();
-                    if (!alreadyThere && contactGroup.name || contactGroup.subject) {
+                    // primeiro vamos verificar se o grupo já existe contactOrGroup.id na model Groups group_id
+                    let alreadyThere = await Groups.findOne({ group_id: contactOrGroup.id }).exec();
+                    if (!alreadyThere) {
                         const saveGroup = new Groups({
-                            name: contactGroup?.name ? contactGroup.name : contactGroup.subject,
-                            group_id: contactGroup.id,
+                            name: contactOrGroup?.name ? contactOrGroup.name : contactOrGroup.subject,
+                            group_id: contactOrGroup.id,
                             instance: this.key
                         });
                         await saveGroup.save();
+                    } else {
+                        // vamso atualziar o nome do grupo
+                        await Groups.updateOne({ group_id: contactOrGroup.id }, { name: contactOrGroup?.name ? contactOrGroup.name : contactOrGroup.subject });
                     }
 
-                } else if (contactGroup.id.endsWith('@s.whatsapp.net')) {
-                    // primeiro vamos verificar se o contato já existe contactGroup.id na model Contacts phone_id
-                    let alreadyThere = await Contacts.findOne({ phone_id: contactGroup.id }).exec();
-                    if (!alreadyThere && (contactGroup.name || contactGroup.notify)) {
+                } else if (contactOrGroup.id.endsWith('@s.whatsapp.net')) {
+                    // primeiro vamos verificar se o contato já existe contactOrGroup.id na model Contacts phone_id
+                    let alreadyThere = await Contacts.findOne({ phone_id: contactOrGroup.id }).exec();
+                    if (!alreadyThere && (contactOrGroup.name || contactOrGroup.notify)) {
                         const saveGroup = new Contacts({
-                            name: contactGroup.name ? contactGroup.name : contactGroup.notify,
-                            notify: contactGroup.notify,
-                            group_id: contactGroup.id,
+                            name: contactOrGroup.name ? contactOrGroup.name : contactOrGroup.notify,
+                            notify: contactOrGroup.notify,
+                            group_id: contactOrGroup.id,
                             instance: this.key
                         });
                         await saveGroup.save();
