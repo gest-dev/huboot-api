@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const Contact = mongoose.model("contacts", {
   name: {
@@ -17,6 +17,10 @@ const Contact = mongoose.model("contacts", {
     type: String,
     require: true,
   },
+  lid: {
+    type: String,
+    require: true,
+  },
   instance: {
     type: String,
     require: true,
@@ -30,4 +34,4 @@ const Contact = mongoose.model("contacts", {
   },
 });
 
-module.exports = Contact;
+export default Contact;

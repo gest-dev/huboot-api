@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const InstanceConfigWebhook = mongoose.model("instanceConfigWebhook", {
   instance: {
@@ -36,4 +36,4 @@ const InstanceConfigWebhook = mongoose.model("instanceConfigWebhook", {
   },
 });
 
-module.exports = InstanceConfigWebhook;
+export default InstanceConfigWebhook;

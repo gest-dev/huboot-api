@@ -1,7 +1,9 @@
-const { MongoClient } = require('mongodb')
-const logger = require('pino')()
+import { MongoClient } from 'mongodb';
+import pino from 'pino';
+const logger = pino();
 
-module.exports = async function connectToCluster(uri) {
+
+export default async function connectToCluster(uri) {
     let mongoClient
 
     try {

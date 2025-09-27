@@ -1,48 +1,43 @@
-const jwt = require('jsonwebtoken')
-const Instances = require("../models/instances.model");
+import jwt from 'jsonwebtoken';
+import Instances from '../models/instances.model.js';
+import config from '../../config/config.js';
 
-exports.ChechTokenKeyInstance = async (req, res, next) => {
+export const ChechTokenKeyInstance = async (req, res, next) => {
     let token = null;
 
     try {
-        let keyQuery = req.query?.key
-        const authHeader = req.headers['authorization']
-        token = (authHeader && authHeader.split(" ")[1])
+        const keyQuery = req.query?.key;
+        const authHeader = req.headers['authorization'];
+        token = authHeader?.split(' ')[1];
 
         if (!token) {
-            return res.status(401).json({ message: 'Token inválido! 1' })
+            return res.status(401).json({ message: 'Token inválido! 1' });
         }
 
         try {
+            const secret = config.auth.SECRET;
+            const decodedToken = jwt.verify(token, secret);
 
-            const secret = process.env.SECRET
-            const decodedToken = jwt.verify(token, secret)
-
-            const instanceKey = decodedToken.key
-            const instanceInfo = await Instances.findOne({
-                key: instanceKey
-            }).exec();
+            const instanceKey = decodedToken.key;
+            const instanceInfo = await Instances.findOne({ key: instanceKey }).exec();
 
             if (!instanceInfo) {
-                return res.status(401).json({ message: 'Instance não encontrada!' })
-            }
-            if (instanceKey != keyQuery) {
-                return res.status(401).json({ message: 'Token inválido para esta instância!' })
+                return res.status(401).json({ message: 'Instance não encontrada!' });
             }
 
-            req.instanceKey = instanceKey
-            // next logout
-            req.token = token
-            next()
-        } catch (error) {
-            console.log(error);
+            if (instanceKey !== keyQuery) {
+                return res.status(401).json({ message: 'Token inválido para esta instância!' });
+            }
 
-            res.status(401).json({ message: "Token inválido! 2" })
+            req.instanceKey = instanceKey;
+            req.token = token;
+            next();
+        } catch (err) {
+            console.error(err);
+            return res.status(401).json({ message: 'Token inválido! 2' });
         }
 
-    } catch (error) {
-        return res.status(401).json({ message: 'Token inválido! 3' })
-
+    } catch (err) {
+        return res.status(401).json({ message: 'Token inválido! 3' });
     }
-
-}
+};

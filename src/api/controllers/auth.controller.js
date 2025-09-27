@@ -1,18 +1,21 @@
 // module imports
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { addMinutes } = require('date-fns');
+import bcrypt from "bcrypt";
+import { addMinutes } from "date-fns";
+import config from '../../config/config.js';
+
 // schemas
-const schemaLogin = require("../schemas/login.schemas");
-const schemaRegister = require("../schemas/registrer.schemas");
+import schemaLogin from "../schemas/login.schemas.js";
+import schemaRegister from "../schemas/registrer.schemas.js";
 
 // models
-const User = require("../models/User.model");
-const InvalidToken = require("../models/InvalidToken.model");
-// class
-const AuthAccessToken = require('../class/authAccessToken')
+import User from "../models/User.model.js";
+import InvalidToken from "../models/InvalidToken.model.js";
 
-exports.loginIndex = async (req, res) => {
+// class
+import AuthAccessToken from "../class/authAccessToken.js";
+
+
+async function loginIndex(req, res) {
   // veririca se existe token no cookie se exisitr joga para a tela de dashboard
   if (req?.cookies?.tokenApiMultiDevice) {
     return res.redirect('/manager');
@@ -25,7 +28,8 @@ exports.loginIndex = async (req, res) => {
   }
 
 }
-exports.login = async (req, res) => {
+
+async function login(req, res) {
   try {
 
     const { error, value } = schemaLogin.validate(req.body, {
@@ -122,7 +126,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.logout = async (req, res) => {
+async function logout(req, res) {
   try {
     // Invalidating token
     const blackList = new InvalidToken({
@@ -140,10 +144,10 @@ exports.logout = async (req, res) => {
   }
 };
 
-exports.registerIndex = async (req, res) => {
+async function registerIndex(req, res) {
   // AUTH_REGISTER_MORE
   const users = await User.find();
-  if (process.env.AUTH_REGISTER_MORE == 'true' || users.length == 0) {
+  if (config.auth.AUTH_REGISTER_MORE == 'true' || users.length == 0) {
     return res.render('auth/register', { error: req.flash('error'), success: req.flash('success') });
   } else {
     if (users.length > 0) {
@@ -152,7 +156,8 @@ exports.registerIndex = async (req, res) => {
   }
 
 }
-exports.register = async (req, res) => {
+
+async function register(req, res) {
   try {
 
     const { error, value } = schemaRegister.validate(req.body, {
@@ -180,7 +185,7 @@ exports.register = async (req, res) => {
     }
 
     // AUTH_REGISTER_MORE
-    if (process.env.AUTH_REGISTER_MORE == 'false') {
+    if (config.auth.AUTH_REGISTER_MORE == 'false') {
       // verifica se ja existe algum suauario e se existir não permite cadastrar novos
       const users = await User.find();
       if (users.length > 0) {
@@ -245,5 +250,13 @@ exports.register = async (req, res) => {
       message: "Houve um erro no servidor, tente novamente mais tarde!",
     });
   }
+};
+
+export default {
+  loginIndex,
+  login,
+  logout,
+  registerIndex,
+  register
 };
 

@@ -1,9 +1,9 @@
-const jwt = require("jsonwebtoken");
-
+import jwt from "jsonwebtoken";
+import config from '../../config/config.js';
 class AuthAccessToken {
   static generateAccessTokenAuth = async (userData) => {
 
-    const secret = process.env.SECRET;
+    const secret = config.auth.SECRET;
     const token = jwt.sign(
       {
         id: userData._id,
@@ -16,7 +16,7 @@ class AuthAccessToken {
 
   static generateAccessTokenInstance = async (instance) => {
 
-    const secret = process.env.SECRET;
+    const secret = config.auth.SECRET;
     const token = jwt.sign(
       {
         key: instance.key,
@@ -28,4 +28,4 @@ class AuthAccessToken {
   };
 }
 
-module.exports = AuthAccessToken;
+export default AuthAccessToken;

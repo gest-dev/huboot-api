@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config(); // garante que process.env está carregado
 // Port number
 const PORT = process.env.PORT || '3333'
 const TOKEN = process.env.TOKEN || ''
@@ -31,7 +33,7 @@ const MARK_MESSAGES_READ = !!(
     process.env.MARK_MESSAGES_READ && process.env.MARK_MESSAGES_READ === 'true'
 )
 
-module.exports = {
+export default {
     port: PORT,
     token: TOKEN,
     restoreSessionsOnStartup: RESTORE_SESSIONS_ON_START_UP,
@@ -58,4 +60,9 @@ module.exports = {
         version: CLIENT_VERSION,
     },
     markMessagesRead: MARK_MESSAGES_READ,
+    auth: {
+        AUTH_REGISTER_MORE: process.env.AUTH_REGISTER_MORE || 'false',
+        SECRET: process.env.SECRET,
+        TOKEN: process.env.TOKEN || '',
+    }
 }

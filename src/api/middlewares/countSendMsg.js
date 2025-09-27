@@ -1,9 +1,9 @@
-const InstancesModel = require("../models/instances.model");
+import InstancesModel from '../models/instances.model.js';
 
-async function countSendMsg(req, res, next) {
+export default async function countSendMsg(req, res, next) {
     try {
         res.on('finish', async () => {
-            //Verifica se o status da resposta é 200 ou 201
+            // Verifica se o status da resposta é 200 ou 201
             if (res.statusCode === 200 || res.statusCode === 201) {
                 const key = req.query?.key;
 
@@ -23,6 +23,4 @@ async function countSendMsg(req, res, next) {
         console.error('Erro no middleware countSendMsg:', error.message);
         next(error); // Passa o erro para o próximo middleware
     }
-};
-
-module.exports = countSendMsg;
+}

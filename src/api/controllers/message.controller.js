@@ -1,5 +1,5 @@
 // Função para formatar o número de telefone
-const { VerifiNumberId } = require('../class/verifiNumberId')
+import VerifiNumberId from '../class/verifiNumberId.js';
 
 function textErrorNumberInvalid(group) {
     if (group) {
@@ -8,7 +8,7 @@ function textErrorNumberInvalid(group) {
         return "Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000";
     }
 }
-exports.Text = async (req, res) => {
+async function Text(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -34,7 +34,7 @@ exports.Text = async (req, res) => {
     }
 }
 
-exports.Image = async (req, res) => {
+async function Image(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -55,7 +55,7 @@ exports.Image = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.Video = async (req, res) => {
+async function Video(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -76,7 +76,7 @@ exports.Video = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.Audio = async (req, res) => {
+async function Audio(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -96,7 +96,7 @@ exports.Audio = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.Document = async (req, res) => {
+async function Document(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -118,7 +118,7 @@ exports.Document = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.Mediaurl = async (req, res) => {
+async function Mediaurl(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -140,7 +140,7 @@ exports.Mediaurl = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.Button = async (req, res) => {
+async function Button(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -159,7 +159,8 @@ exports.Button = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.Contact = async (req, res) => {
+
+async function Contact(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -178,9 +179,26 @@ exports.Contact = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-
-exports.Poll = async (req, res) => {
+async function List(req, res) {
     let rawGroup = req.body?.group;
+    let group = rawGroup === true || rawGroup === 'true' ? true : false;
+
+    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
+
+    if (formatPhoneNumberId === null) {
+        return res.status(429).json({
+            error: true,
+            message: textErrorNumberInvalid(group),
+        });
+    }
+    const data = await WhatsAppInstances[req.query.key].sendListMessage(
+        formatPhoneNumberId,
+        req.body.msgdata
+    )
+    return res.status(201).json({ error: false, data: data })
+}
+
+async function Poll(req, res) {
     let group = true;// so funciona em grupos
     let name = req.body?.name;
     let values = req.body?.values;
@@ -212,26 +230,7 @@ exports.Poll = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.List = async (req, res) => {
-    let rawGroup = req.body?.group;
-    let group = rawGroup === true || rawGroup === 'true' ? true : false;
-
-    let formatPhoneNumberId = group ? VerifiNumberId.testFormatGroupId(req.body.id) : VerifiNumberId.formatPhoneNumber(req.body.id);
-
-    if (formatPhoneNumberId === null) {
-        return res.status(429).json({
-            error: true,
-            message: textErrorNumberInvalid(group),
-        });
-    }
-    const data = await WhatsAppInstances[req.query.key].sendListMessage(
-        formatPhoneNumberId,
-        req.body.msgdata
-    )
-    return res.status(201).json({ error: false, data: data })
-}
-
-exports.MediaButton = async (req, res) => {
+async function MediaButton(req, res) {
     let rawGroup = req.body?.group;
     let group = rawGroup === true || rawGroup === 'true' ? true : false;
 
@@ -250,7 +249,7 @@ exports.MediaButton = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.SetStatus = async (req, res) => {
+async function SetStatus(req, res) {
     const presenceList = [
         'unavailable',
         'available',
@@ -273,12 +272,29 @@ exports.SetStatus = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.Read = async (req, res) => {
+async function Read(req, res) {
     const data = await WhatsAppInstances[req.query.key].readMessage(req.body.msg)
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.React = async (req, res) => {
+async function React(req, res) {
     const data = await WhatsAppInstances[req.query.key].reactMessage(req.body.id, req.body.key, req.body.emoji)
     return res.status(201).json({ error: false, data: data })
+}
+
+export default {
+    Text,
+    Image,
+    Video,
+    Audio,
+    Document,
+    Mediaurl,
+    Button,
+    Contact,
+    List,
+    Poll,
+    MediaButton,
+    SetStatus,
+    Read,
+    React
 }

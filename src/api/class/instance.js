@@ -1,24 +1,23 @@
-const InstanceConfigWebhook = require("../models/InstanceConfigWebhook.model");
-const QRCode = require('qrcode')
-const pino = require('pino')
-const {
-    default: makeWASocket,
-    DisconnectReason,
-} = require('@whiskeysockets/baileys')
-const { unlinkSync } = require('fs')
-const { v4: uuidv4 } = require('uuid')
-const path = require('path')
-const processButton = require('../helper/processbtn')
-const generateVC = require('../helper/genVc')
-const Chat = require('../models/chat.model')
-const axios = require('axios')
-const config = require('../../config/config')
-const downloadMessage = require('../helper/downloadMsg')
-const logger = require('pino')()
-const useMongoDBAuthState = require('../helper/mongoAuthState')
-const Contacts = require('../models/Contacts.model')
-const Groups = require('../models/Groups.model')
-const InstancesModel = require("../models/instances.model");
+import InstanceConfigWebhook from "../models/InstanceConfigWebhook.model.js";
+import QRCode from "qrcode";
+import pino from "pino";
+import makeWASocket, { DisconnectReason } from "@whiskeysockets/baileys";
+
+import { unlinkSync } from "fs";
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
+import processButton from "../helper/processbtn.js";
+import generateVC from "../helper/genVc.js";
+import Chat from "../models/chat.model.js";
+import axios from "axios";
+import config from "../../config/config.js";
+import downloadMessage from "../helper/downloadMsg.js";
+const logger = pino();
+import useMongoDBAuthState from "../helper/mongoAuthState.js";
+import Contacts from "../models/Contacts.model.js";
+import Groups from "../models/Groups.model.js";
+import InstancesModel from "../models/instances.model.js";
+
 
 
 class WhatsAppInstance {
@@ -28,6 +27,11 @@ class WhatsAppInstance {
         logger: pino({
             level: config.log.level,
         }),
+        //version,
+        //auth: state,
+        shouldSyncHistoryMessage: () => true,
+        syncFullHistory: false,
+        markOnlineOnConnect: false,
     }
     key = ''
     authState
@@ -39,8 +43,6 @@ class WhatsAppInstance {
         messages: [],
         qrRetry: 0,
     }
-
-
 
     constructor(key) {
         this.key = key ? key : uuidv4()
@@ -72,28 +74,148 @@ class WhatsAppInstance {
             })
     }
 
+    async clearProblematicSessions() {
+        try {
+            console.log('Cleaning up problematic sessions...');
+
+            // Remove sessões com PreKey IDs inválidos
+            const sessionKeys = await this.collection.find({
+                _id: { $regex: /^(session-|sender-key-)/ }
+            }).toArray();
+
+            for (const key of sessionKeys) {
+                try {
+                    // Verifica se a sessão é válida
+                    const sessionData = await this.collection.findOne({ _id: key._id });
+                    if (sessionData && sessionData.data) {
+                        // Remove sessões que podem estar corrompidas
+                        const dataStr = JSON.stringify(sessionData.data);
+                        if (dataStr.includes('"senderMessageKeys":91') ||
+                            dataStr.includes('"senderMessageKeys":"91"')) {
+                            await this.collection.deleteOne({ _id: key._id });
+                            console.log(`Removed corrupted session: ${key._id}`);
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Error checking session ${key._id}:`, error);
+                    // Remove sessões corrompidas
+                    await this.collection.deleteOne({ _id: key._id });
+                }
+            }
+
+            // Atualiza as credenciais se necessário
+            const credsDoc = await this.collection.findOne({ _id: 'creds' });
+            if (credsDoc && credsDoc.data) {
+                let needsUpdate = false;
+                if (!credsDoc.data.nextPreKeyId || credsDoc.data.nextPreKeyId < 1) {
+                    credsDoc.data.nextPreKeyId = 1;
+                    credsDoc.data.firstUnuploadedPreKeyId = 1;
+                    needsUpdate = true;
+                }
+                if (!credsDoc.data.accountSyncCounter) {
+                    credsDoc.data.accountSyncCounter = 0;
+                    needsUpdate = true;
+                }
+
+                if (needsUpdate) {
+                    await this.collection.replaceOne(
+                        { _id: 'creds' },
+                        credsDoc
+                    );
+                    console.log('Fixed credentials structure');
+                }
+            }
+        } catch (error) {
+            console.error('Error cleaning sessions:', error);
+        }
+    }
     async init() {
-        this.collection = mongoClient.db(config.mongoose.dbName).collection(this.key)
-        const { state, saveCreds } = await useMongoDBAuthState(this.collection)
-        this.authState = { state: state, saveCreds: saveCreds }
-        this.socketConfig.auth = this.authState.state
-        this.socketConfig.browser = Object.values(config.browser)
-        this.instance.sock = makeWASocket(this.socketConfig)
 
-        this.setHandler()
+        if (!mongoClient) {
+            throw new Error('MongoDB client not initialized');
+        }
 
+        this.collection = mongoClient.db(config.mongoose.dbName).collection(this.key);
+        console.log('Collection name:', this.collection.collectionName);
+
+        // Limpar sessões problemáticas antes de inicializar
+        await this.clearProblematicSessions();
+
+        const { state, saveCreds } = await useMongoDBAuthState(this.collection);
+        this.authState = { state: state, saveCreds: saveCreds };
+        this.socketConfig.auth = this.authState.state;
+        this.socketConfig.browser = Object.values(config.browser);
+
+        // Configuração adicional para evitar erros de PreKey
+        this.socketConfig.retryRequestDelayMs = 1000;
+        this.socketConfig.maxMsgRetryCount = 3;
+        this.socketConfig.markOnlineOnConnect = true;
+
+        this.instance.sock = makeWASocket(this.socketConfig);
+        this.setHandler();
+        // Listener para pegar todos os grupos assim que conectar
+        // const fetchGroups = async (update) => {
+        //     if (update.connection === 'open') {
+        //         try {
+        //             // Buscar grupos
+        //             const groups = await this.instance.sock.groupFetchAllParticipating()
+        //             await this.saveContactsOrdGroups(Object.values(groups))
+
+        //             // Buscar contatos bloqueados
+        //             //const contactsBlocks = await this.instance.sock.fetchBlocklist()
+
+        //             // Remove o listener para não disparar novamente
+        //             this.instance.sock.ev.off('connection.update', fetchGroups)
+        //         } catch (e) {
+        //             console.error("Erro ao buscar grupos:", e)
+        //         }
+        //     }
+        // }
+
+        // this.instance.sock.ev.on('connection.update', fetchGroups)
 
         return this
     }
 
+    async clearSessionForJid(jid) {
+        try {
+            // Remove sessões específicas para um JID
+            const sessionKeys = await this.collection.find({
+                _id: { $regex: new RegExp(`^session-${jid.replace(/[^a-zA-Z0-9]/g, '_')}`) }
+            }).toArray();
+
+            for (const key of sessionKeys) {
+                await this.collection.deleteOne({ _id: key._id });
+                console.log(`Cleared session: ${key._id}`);
+            }
+        } catch (error) {
+            console.error('Error clearing session for JID:', error);
+        }
+    }
+
+    // Atualize o handler de connection.update para lidar melhor com erros
     setHandler() {
         const sock = this.instance.sock;
 
         // on credentials update save state
-        sock?.ev.on('creds.update', this.authState.saveCreds);
+        sock?.ev.on('creds.update', async (update) => {
+            console.log('creds.update received');
+            try {
+                await this.authState.saveCreds();
+
+                // Log para debug
+                if (update && update.accountSyncCounter) {
+                    console.log('Account sync counter:', update.accountSyncCounter);
+                }
+            } catch (error) {
+                console.error('Error saving credentials:', error);
+            }
+        });
 
         // on socket closed, opened, connecting
         sock?.ev.on('connection.update', async (update) => {
+            console.log('connection.update');
+
             const { connection, lastDisconnect, qr } = update;
 
             //console.log(`Connection update: ${connection}`);
@@ -154,6 +276,7 @@ class WhatsAppInstance {
                 if (instanceConfigWebhookConfig && ['all', 'connection', 'connection.update', 'connection:open'].some((e) => instanceConfigWebhookConfig.events.includes(e))) {
                     await this.SendWebhook('connection', { connection: connection }, this.key, instanceConfigWebhookConfig);
                 }
+
             }
 
             if (qr) {
@@ -172,8 +295,11 @@ class WhatsAppInstance {
             }
         });
 
+
+
         // sending presence
         sock?.ev.on('presence.update', async (json) => {
+            console.log('presence.update');
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -189,6 +315,8 @@ class WhatsAppInstance {
         // contacts update
         sock?.ev.on('contacts.update', async (json) => {
 
+            console.log('contacts.update', json);
+
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
                 ['all', 'contacts', 'contacts.update'].some((e) =>
@@ -201,6 +329,7 @@ class WhatsAppInstance {
 
         //If you only want to export all the numbers saved in your contact list, you can do it as follows:
         sock?.ev.on('contacts.upsert', async (data) => {
+            console.log('contacts.upsert', data);
 
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -212,8 +341,13 @@ class WhatsAppInstance {
             }
 
         })
+
         //If you want to export numbers from all your previous individual conversations, you can do it as follows:
         sock.ev.on('messaging-history.set', async (data) => {
+            // console.log(data);
+            console.log('messaging-history.set');
+
+
             const messagingHistoryData = data.contacts;
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -227,13 +361,15 @@ class WhatsAppInstance {
                 await this.SendWebhook('contacts', filteredContacts, this.key, instanceConfigWebhookConfig);
             }
 
-            this.saveContactsAndGroups(messagingHistoryData);
+            this.saveContactsOrdGroups(messagingHistoryData);
 
         });
 
 
         // on receive all chats
         sock?.ev.on('chats.set', async ({ chats }) => {
+            console.log('chats.set');
+
             this.instance.chats = []
             const recivedChats = chats.map((chat) => {
                 return {
@@ -248,7 +384,7 @@ class WhatsAppInstance {
 
         // on recive new chat
         sock?.ev.on('chats.upsert', (newChat) => {
-            // console.log('chats.upsert')
+            console.log('chats.upsert')
             // console.log(newChat)
             const chats = newChat.map((chat) => {
                 return {
@@ -261,8 +397,7 @@ class WhatsAppInstance {
 
         // on chat change
         sock?.ev.on('chats.update', (changedChat) => {
-            //console.log('chats.update')
-            //console.log(changedChat)
+            console.log('chats.update')
             changedChat.map((chat) => {
                 const index = this.instance.chats.findIndex(
                     (pc) => pc.id === chat.id
@@ -277,7 +412,7 @@ class WhatsAppInstance {
 
         // on chat delete
         sock?.ev.on('chats.delete', (deletedChats) => {
-            //console.log('chats.delete')
+            console.log('chats.delete')
             //console.log(deletedChats)
             deletedChats.map((chat) => {
                 const index = this.instance.chats.findIndex(
@@ -289,13 +424,11 @@ class WhatsAppInstance {
 
         // on new mssage
         sock?.ev.on('messages.upsert', async (m) => {
-
-            //console.log(m)
+            console.log('messages.upsert')
             if (m.type === 'prepend')
                 this.instance.messages.unshift(...m.messages)
             if (m.type !== 'notify') return
 
-            // https://adiwajshing.github.io/Baileys/#reading-messages
             if (config.markMessagesRead) {
                 const unreadMessages = m.messages.map((msg) => {
                     return {
@@ -382,11 +515,28 @@ class WhatsAppInstance {
             })
         })
 
-        sock?.ev.on('messages.update', async (messages) => {
-            //console.log('entrou no on messages.update')
-            //console.dir(messages);
-        })
+        // Adicione um handler específico para erros de criptografia
+        sock?.ev.on('messages.update', async (updates) => {
+            for (const update of updates) {
+                if (update.update && update.update.messageStubType === 7) {
+                    // This indicates a session problem, try to fix it
+                    console.log('Detected session problem, attempting to fix...');
+                    try {
+                        // Force a new session by clearing the problematic one
+                        if (update.key && update.key.remoteJid) {
+                            const sessionId = update.key.remoteJid;
+                            await this.clearSessionForJid(sessionId);
+                        }
+                    } catch (error) {
+                        console.error('Error fixing session:', error);
+                    }
+                }
+            }
+        });
+
         sock?.ws.on('CB:call', async (data) => {
+            console.log('CB:call');
+
             if (data.content) {
                 if (data.content.find((e) => e.tag === 'offer')) {
                     const content = data.content.find((e) => e.tag === 'offer')
@@ -437,8 +587,9 @@ class WhatsAppInstance {
         })
 
         sock?.ev.on('groups.upsert', async (newChat) => {
-            //console.log('groups.upsert')
-            //console.log(newChat)
+
+            // console.log(newChat)
+            console.log('groups.upsert')
             this.createGroupByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -456,8 +607,8 @@ class WhatsAppInstance {
         })
 
         sock?.ev.on('groups.update', async (newChat) => {
-            //console.log('groups.update')
-            //console.log(newChat)
+            // console.log(newChat)
+            console.log('groups.update')
             this.updateGroupSubjectByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -475,8 +626,8 @@ class WhatsAppInstance {
         })
 
         sock?.ev.on('group-participants.update', async (newChat) => {
-            //console.log('group-participants.update')
             //console.log(newChat)
+            console.log('group-participants.update')
             this.updateGroupParticipantsByApp(newChat)
             const instanceConfigWebhookConfig = await InstanceConfigWebhook.findOne({ instance: this.key });
             if (instanceConfigWebhookConfig &&
@@ -595,6 +746,7 @@ class WhatsAppInstance {
 
     async sendTextMessage(to, message) {
         const formattedId = this.getWhatsAppId(to);
+        console.log(formattedId);
 
         try {
 
@@ -806,7 +958,7 @@ class WhatsAppInstance {
     async getUserOrGroupById(id) {
         try {
             let Chats = await this.getChat()
-            // console.log(Chats)
+            //console.log(Chats)
             const group = Chats.find((c) => c.id === this.getWhatsAppId(id))
             if (!group)
                 throw new Error(
@@ -996,19 +1148,26 @@ class WhatsAppInstance {
     }
 
     async updateGroupSubjectByApp(newChat) {
-        //console.log(newChat)
         try {
             if (newChat[0] && newChat[0].subject) {
-                let Chats = await this.getChat()
-                Chats.find((c) => c.id === newChat[0].id).name =
-                    newChat[0].subject
-                await this.updateDb(Chats)
+                let Chats = await this.getChat();
+                //console.log(Chats);
+
+                const chatToUpdate = Chats.find(c => c.id === newChat[0].id);
+
+                if (chatToUpdate) {
+                    chatToUpdate.name = newChat[0].subject;
+                    await this.updateDb(Chats);
+                } else {
+                    logger.warn(`Chat with id ${newChat[0].id} not found`);
+                }
             }
         } catch (e) {
-            logger.error(e)
-            logger.error('Error updating document failed')
+            logger.error(e);
+            logger.error('Error updating document failed');
         }
     }
+
 
     async updateGroupParticipantsByApp(newChat) {
         //console.log(newChat)
@@ -1206,30 +1365,41 @@ class WhatsAppInstance {
     }
 
     /* contacts and group save database instance */
-    async saveContactsAndGroups(arrayContactsOrGroups) {
+    async saveContactsOrdGroups(arrayContactsOrGroups) {
         try {
-            for (const contactGroup of arrayContactsOrGroups) {
-                if (contactGroup.id.endsWith('@g.us')) {
+            for (const contactOrGroup of arrayContactsOrGroups) {
+                //console.log(contactOrGroup);
 
-                    // primeiro vamos verificar se o grupo já existe contactGroup.id na model Groups group_id
-                    let alreadyThere = await Groups.findOne({ group_id: contactGroup.id }).exec();
-                    if (!alreadyThere && contactGroup.name) {
+                if (contactOrGroup.id && contactOrGroup.id.endsWith('@g.us')) {
+                    // Filtrar grupos que tenham formato "numero-traco@g.us"
+                    if (/^\d+-\d+@g\.us$/.test(contactOrGroup.id)) {
+                        continue; // pula esse grupo
+                    }
+
+                    // primeiro vamos verificar se o grupo já existe contactOrGroup.id na model Groups group_id
+                    let alreadyThere = await Groups.findOne({ group_id: contactOrGroup.id }).exec();
+                    if (!alreadyThere) {
                         const saveGroup = new Groups({
-                            name: contactGroup.name,
-                            group_id: contactGroup.id,
+                            name: contactOrGroup?.name ? contactOrGroup.name : contactOrGroup.subject,
+                            group_id: contactOrGroup.id,
                             instance: this.key
                         });
                         await saveGroup.save();
+                    } else {
+                        // vamso atualziar o nome do grupo
+                        await Groups.updateOne({ group_id: contactOrGroup.id }, { name: contactOrGroup?.name ? contactOrGroup.name : contactOrGroup.subject });
                     }
 
-                } else if (contactGroup.id.endsWith('@s.whatsapp.net')) {
-                    // primeiro vamos verificar se o contato já existe contactGroup.id na model Contacts phone_id
-                    let alreadyThere = await Contacts.findOne({ phone_id: contactGroup.id }).exec();
-                    if (!alreadyThere && (contactGroup.name || contactGroup.notify)) {
+                } else if (contactOrGroup.id && contactOrGroup.id.endsWith('@s.whatsapp.net')) {
+                    // primeiro vamos verificar se o contato já existe contactOrGroup.id na model Contacts phone_id
+
+                    let alreadyThere = await Contacts.findOne({ phone_id: contactOrGroup.id }).exec();
+                    if (!alreadyThere && contactOrGroup.name && contactOrGroup.lid) {
+                        console.log(contactOrGroup);
                         const saveGroup = new Contacts({
-                            name: contactGroup.name ? contactGroup.name : contactGroup.notify,
-                            notify: contactGroup.notify,
-                            group_id: contactGroup.id,
+                            name: contactOrGroup.name ? contactOrGroup.name : contactOrGroup.notify,
+                            phone_id: contactOrGroup.id,
+                            lid: contactOrGroup.lid,
                             instance: this.key
                         });
                         await saveGroup.save();
@@ -1245,4 +1415,4 @@ class WhatsAppInstance {
 
 }
 
-exports.WhatsAppInstance = WhatsAppInstance
+export default WhatsAppInstance;

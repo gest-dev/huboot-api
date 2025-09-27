@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const Groups = mongoose.model("groups", {
   name: {
@@ -22,4 +22,4 @@ const Groups = mongoose.model("groups", {
   },
 });
 
-module.exports = Groups;
+export default Groups;

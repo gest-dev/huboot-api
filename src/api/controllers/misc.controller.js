@@ -1,7 +1,7 @@
 // Função para formatar o número de telefone
-const { VerifiNumberId } = require('../class/verifiNumberId')
+import VerifiNumberId from '../class/verifiNumberId.js';
 
-exports.onWhatsapp = async (req, res) => {
+async function onWhatsapp(req, res) {
     // eslint-disable-next-line no-unsafe-optional-chaining
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
@@ -17,7 +17,7 @@ exports.onWhatsapp = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.downProfile = async (req, res) => {
+async function downProfile(req, res) {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
     if (formatPhoneNumberId === null) {
@@ -31,8 +31,7 @@ exports.downProfile = async (req, res) => {
     )
     return res.status(201).json({ error: false, data: data })
 }
-
-exports.getStatus = async (req, res) => {
+async function getStatus(req, res) {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
     if (formatPhoneNumberId === null) {
@@ -47,7 +46,7 @@ exports.getStatus = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.blockUser = async (req, res) => {
+async function blockUser(req, res) {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
     if (formatPhoneNumberId === null) {
@@ -70,7 +69,7 @@ exports.blockUser = async (req, res) => {
             .json({ error: false, message: 'Contact Unblocked' })
 }
 
-exports.updateProfilePicture = async (req, res) => {
+async function updateProfilePicture(req, res) {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
     if (formatPhoneNumberId === null) {
@@ -86,7 +85,7 @@ exports.updateProfilePicture = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
-exports.getUserOrGroupById = async (req, res) => {
+async function getUserOrGroupById(req, res) {
     let formatPhoneNumberId = VerifiNumberId.formatPhoneNumber(req.query.id);
 
     if (formatPhoneNumberId === null) {
@@ -99,4 +98,13 @@ exports.getUserOrGroupById = async (req, res) => {
         formatPhoneNumberId
     )
     return res.status(201).json({ error: false, data: data })
+}
+
+export default {
+    onWhatsapp,
+    downProfile,
+    getStatus,
+    blockUser,
+    updateProfilePicture,
+    getUserOrGroupById
 }

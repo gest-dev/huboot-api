@@ -1,4 +1,4 @@
-module.exports = function processButton(buttons) {
+export default function processButton(buttons) {
     const preparedButtons = []
 
     buttons.map((button) => {
