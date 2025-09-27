@@ -1395,7 +1395,7 @@ class WhatsAppInstance {
 
                     let alreadyThere = await Contacts.findOne({ phone_id: contactOrGroup.id }).exec();
                     if (!alreadyThere && contactOrGroup.name && contactOrGroup.lid) {
-                        console.log(contactOrGroup);
+
                         const saveGroup = new Contacts({
                             name: contactOrGroup.name ? contactOrGroup.name : contactOrGroup.notify,
                             phone_id: contactOrGroup.id,
