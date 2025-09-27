@@ -27,6 +27,11 @@ class WhatsAppInstance {
         logger: pino({
             level: config.log.level,
         }),
+        //version,
+        //auth: state,
+        shouldSyncHistoryMessage: () => true,
+        syncFullHistory: false,
+        markOnlineOnConnect: false,
     }
     key = ''
     authState
@@ -69,48 +74,143 @@ class WhatsAppInstance {
             })
     }
 
+    async clearProblematicSessions() {
+        try {
+            console.log('Cleaning up problematic sessions...');
 
-    async init() {
+            // Remove sessões com PreKey IDs inválidos
+            const sessionKeys = await this.collection.find({
+                _id: { $regex: /^(session-|sender-key-)/ }
+            }).toArray();
 
-        this.collection = mongoClient.db(config.mongoose.dbName).collection(this.key)
-        const { state, saveCreds } = await useMongoDBAuthState(this.collection)
-        this.authState = { state: state, saveCreds: saveCreds }
-        this.socketConfig.auth = this.authState.state
-        this.socketConfig.browser = Object.values(config.browser)
-
-        this.instance.sock = makeWASocket(this.socketConfig)
-
-
-        this.setHandler()
-        // Listener para pegar todos os grupos assim que conectar
-        const fetchGroups = async (update) => {
-            if (update.connection === 'open') {
+            for (const key of sessionKeys) {
                 try {
-                    // Buscar grupos
-                    const groups = await this.instance.sock.groupFetchAllParticipating()
-                    await this.saveContactsOrdGroups(Object.values(groups))
-
-                    // Buscar contatos bloqueados
-                    //const contactsBlocks = await this.instance.sock.fetchBlocklist()
-
-                    // Remove o listener para não disparar novamente
-                    this.instance.sock.ev.off('connection.update', fetchGroups)
-                } catch (e) {
-                    console.error("Erro ao buscar grupos:", e)
+                    // Verifica se a sessão é válida
+                    const sessionData = await this.collection.findOne({ _id: key._id });
+                    if (sessionData && sessionData.data) {
+                        // Remove sessões que podem estar corrompidas
+                        const dataStr = JSON.stringify(sessionData.data);
+                        if (dataStr.includes('"senderMessageKeys":91') ||
+                            dataStr.includes('"senderMessageKeys":"91"')) {
+                            await this.collection.deleteOne({ _id: key._id });
+                            console.log(`Removed corrupted session: ${key._id}`);
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Error checking session ${key._id}:`, error);
+                    // Remove sessões corrompidas
+                    await this.collection.deleteOne({ _id: key._id });
                 }
             }
+
+            // Atualiza as credenciais se necessário
+            const credsDoc = await this.collection.findOne({ _id: 'creds' });
+            if (credsDoc && credsDoc.data) {
+                let needsUpdate = false;
+                if (!credsDoc.data.nextPreKeyId || credsDoc.data.nextPreKeyId < 1) {
+                    credsDoc.data.nextPreKeyId = 1;
+                    credsDoc.data.firstUnuploadedPreKeyId = 1;
+                    needsUpdate = true;
+                }
+                if (!credsDoc.data.accountSyncCounter) {
+                    credsDoc.data.accountSyncCounter = 0;
+                    needsUpdate = true;
+                }
+
+                if (needsUpdate) {
+                    await this.collection.replaceOne(
+                        { _id: 'creds' },
+                        credsDoc
+                    );
+                    console.log('Fixed credentials structure');
+                }
+            }
+        } catch (error) {
+            console.error('Error cleaning sessions:', error);
+        }
+    }
+    async init() {
+
+        if (!mongoClient) {
+            throw new Error('MongoDB client not initialized');
         }
 
-        this.instance.sock.ev.on('connection.update', fetchGroups)
+        this.collection = mongoClient.db(config.mongoose.dbName).collection(this.key);
+        console.log('Collection name:', this.collection.collectionName);
+
+        // Limpar sessões problemáticas antes de inicializar
+        await this.clearProblematicSessions();
+
+        const { state, saveCreds } = await useMongoDBAuthState(this.collection);
+        this.authState = { state: state, saveCreds: saveCreds };
+        this.socketConfig.auth = this.authState.state;
+        this.socketConfig.browser = Object.values(config.browser);
+
+        // Configuração adicional para evitar erros de PreKey
+        this.socketConfig.retryRequestDelayMs = 1000;
+        this.socketConfig.maxMsgRetryCount = 3;
+        this.socketConfig.markOnlineOnConnect = true;
+
+        this.instance.sock = makeWASocket(this.socketConfig);
+        this.setHandler();
+        // Listener para pegar todos os grupos assim que conectar
+        // const fetchGroups = async (update) => {
+        //     if (update.connection === 'open') {
+        //         try {
+        //             // Buscar grupos
+        //             const groups = await this.instance.sock.groupFetchAllParticipating()
+        //             await this.saveContactsOrdGroups(Object.values(groups))
+
+        //             // Buscar contatos bloqueados
+        //             //const contactsBlocks = await this.instance.sock.fetchBlocklist()
+
+        //             // Remove o listener para não disparar novamente
+        //             this.instance.sock.ev.off('connection.update', fetchGroups)
+        //         } catch (e) {
+        //             console.error("Erro ao buscar grupos:", e)
+        //         }
+        //     }
+        // }
+
+        // this.instance.sock.ev.on('connection.update', fetchGroups)
 
         return this
     }
 
+    async clearSessionForJid(jid) {
+        try {
+            // Remove sessões específicas para um JID
+            const sessionKeys = await this.collection.find({
+                _id: { $regex: new RegExp(`^session-${jid.replace(/[^a-zA-Z0-9]/g, '_')}`) }
+            }).toArray();
+
+            for (const key of sessionKeys) {
+                await this.collection.deleteOne({ _id: key._id });
+                console.log(`Cleared session: ${key._id}`);
+            }
+        } catch (error) {
+            console.error('Error clearing session for JID:', error);
+        }
+    }
+
+    // Atualize o handler de connection.update para lidar melhor com erros
     setHandler() {
         const sock = this.instance.sock;
 
         // on credentials update save state
-        sock?.ev.on('creds.update', this.authState.saveCreds);
+        sock?.ev.on('creds.update', async (update) => {
+            console.log('creds.update received');
+            try {
+                await this.authState.saveCreds();
+
+                // Log para debug
+                if (update && update.accountSyncCounter) {
+                    console.log('Account sync counter:', update.accountSyncCounter);
+                }
+            } catch (error) {
+                console.error('Error saving credentials:', error);
+            }
+        });
 
         // on socket closed, opened, connecting
         sock?.ev.on('connection.update', async (update) => {
@@ -415,10 +515,25 @@ class WhatsAppInstance {
             })
         })
 
-        sock?.ev.on('messages.update', async (messages) => {
-            console.log('messages.update')
-            //console.dir(messages);
-        })
+        // Adicione um handler específico para erros de criptografia
+        sock?.ev.on('messages.update', async (updates) => {
+            for (const update of updates) {
+                if (update.update && update.update.messageStubType === 7) {
+                    // This indicates a session problem, try to fix it
+                    console.log('Detected session problem, attempting to fix...');
+                    try {
+                        // Force a new session by clearing the problematic one
+                        if (update.key && update.key.remoteJid) {
+                            const sessionId = update.key.remoteJid;
+                            await this.clearSessionForJid(sessionId);
+                        }
+                    } catch (error) {
+                        console.error('Error fixing session:', error);
+                    }
+                }
+            }
+        });
+
         sock?.ws.on('CB:call', async (data) => {
             console.log('CB:call');
 
@@ -631,6 +746,7 @@ class WhatsAppInstance {
 
     async sendTextMessage(to, message) {
         const formattedId = this.getWhatsAppId(to);
+        console.log(formattedId);
 
         try {
 
@@ -1276,12 +1392,14 @@ class WhatsAppInstance {
 
                 } else if (contactOrGroup.id && contactOrGroup.id.endsWith('@s.whatsapp.net')) {
                     // primeiro vamos verificar se o contato já existe contactOrGroup.id na model Contacts phone_id
+
                     let alreadyThere = await Contacts.findOne({ phone_id: contactOrGroup.id }).exec();
-                    if (!alreadyThere && (contactOrGroup.name || contactOrGroup.notify)) {
+                    if (!alreadyThere && contactOrGroup.name && contactOrGroup.lid) {
+                        console.log(contactOrGroup);
                         const saveGroup = new Contacts({
                             name: contactOrGroup.name ? contactOrGroup.name : contactOrGroup.notify,
-                            notify: contactOrGroup.notify,
-                            group_id: contactOrGroup.id,
+                            phone_id: contactOrGroup.id,
+                            lid: contactOrGroup.lid,
                             instance: this.key
                         });
                         await saveGroup.save();

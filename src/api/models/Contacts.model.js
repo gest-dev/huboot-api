@@ -17,6 +17,10 @@ const Contact = mongoose.model("contacts", {
     type: String,
     require: true,
   },
+  lid: {
+    type: String,
+    require: true,
+  },
   instance: {
     type: String,
     require: true,
