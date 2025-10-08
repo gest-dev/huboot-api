@@ -1351,7 +1351,7 @@ class WhatsAppInstance {
             const res = await this.instance.sock?.sendMessage(
                 this.getWhatsAppId(msg.key.remoteJid),
                 {
-                    reaction: {
+                    react: {
                         text: msg.emoji, // use an empty string to remove the reaction
                         key: msg.key,
                     },

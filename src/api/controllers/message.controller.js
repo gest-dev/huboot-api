@@ -273,6 +273,7 @@ async function SetStatus(req, res) {
 }
 
 async function Read(req, res) {
+    
     const data = await WhatsAppInstances[req.query.key].readMessage(req.body)
     return res.status(201).json({ error: false, data: data })
 }
