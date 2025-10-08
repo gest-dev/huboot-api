@@ -1346,17 +1346,16 @@ class WhatsAppInstance {
         }
     }
 
-    async reactMessage(id, key, emoji) {
+    async reactMessage(msg) {
         try {
-            const reactionMessage = {
-                react: {
-                    text: emoji, // use an empty string to remove the reaction
-                    key: key,
-                },
-            }
             const res = await this.instance.sock?.sendMessage(
-                this.getWhatsAppId(id),
-                reactionMessage
+                this.getWhatsAppId(msg.key.remoteJid),
+                {
+                    reaction: {
+                        text: msg.emoji, // use an empty string to remove the reaction
+                        key: msg.key,
+                    },
+                }
             )
             return res
         } catch (e) {

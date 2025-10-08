@@ -278,7 +278,7 @@ async function Read(req, res) {
 }
 
 async function React(req, res) {
-    const data = await WhatsAppInstances[req.query.key].reactMessage(req.body.id, req.body.key, req.body.emoji)
+    const data = await WhatsAppInstances[req.query.key].reactMessage(req.body)
     return res.status(201).json({ error: false, data: data })
 }
 
