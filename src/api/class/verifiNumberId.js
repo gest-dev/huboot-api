@@ -1,5 +1,7 @@
 class VerifiNumberId {
     static formatPhoneNumber(phoneNumber) {
+        // se tiver @s.whatsapp.net remove
+        phoneNumber = phoneNumber.replace('@s.whatsapp.net', '');
         // Remove qualquer caractere que não seja número
         phoneNumber = phoneNumber.replace(/\D/g, '');
 

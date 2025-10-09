@@ -5,7 +5,7 @@ function textErrorNumberInvalid(group) {
     if (group) {
         return "ID de grupo inválido. O identificador de grupo deve terminar com '@g.us'. Exemplo: 120003324939242500@g.us.";
     } else {
-        return "Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000";
+        return "Número de telefone inválido. Envie o número completo com 13 ou 12 dígitos, incluindo DDI (55), DDD (ex: 11) e número com 9 dígitos iniciando por 9. Exemplo: 5511900000000 ou sem o 9  Exemplo: 551100000000 ou remoteJid 551100000000@s.whatsapp.net";
     }
 }
 async function Text(req, res) {
