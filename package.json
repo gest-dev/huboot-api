@@ -1,6 +1,6 @@
 {
     "name": "huboot-api",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "huboot-api is builton top of Baileys-MD.",
     "main": "server.js",
     "engines": {
