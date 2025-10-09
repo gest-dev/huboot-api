@@ -38,7 +38,8 @@ class VerifiNumberId {
         ];
 
         // Verifica se tem exatamente 13 dígitos
-        if (phoneNumber.length !== 13) {
+
+        if (phoneNumber.length !== 13 && phoneNumber.length !== 12) {
             return null;
         }
 
@@ -57,7 +58,8 @@ class VerifiNumberId {
         // Verifica se o número começa com 9 (após DDI e DDD)
         const firstDigitAfterDdd = phoneNumber.charAt(4);
         if (firstDigitAfterDdd !== '9') {
-            return null;
+            // adiciona o 9
+            phoneNumber = '9' + phoneNumber.slice(4);
         }
 
         return phoneNumber;
