@@ -32,12 +32,14 @@ const MONGODB_DB_NAME = process.env.MONGO_DATABASE_NAME || 'WhatsAppInstance'
 const MARK_MESSAGES_READ = !!(
     process.env.MARK_MESSAGES_READ && process.env.MARK_MESSAGES_READ === 'true'
 )
+const version = process.env.SET_VERSION_WHATSAPP.split(',').map(Number);
 
 export default {
     port: PORT,
     token: TOKEN,
     restoreSessionsOnStartup: RESTORE_SESSIONS_ON_START_UP,
     appUrl: APP_URL,
+    version_connect: process.env.SET_VERSION_WHATSAPP,
     log: {
         level: LOG_LEVEL,
     },

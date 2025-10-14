@@ -1,7 +1,7 @@
 import InstanceConfigWebhook from "../models/InstanceConfigWebhook.model.js";
 import QRCode from "qrcode";
 import pino from "pino";
-import makeWASocket, { DisconnectReason } from "@whiskeysockets/baileys";
+import makeWASocket, { DisconnectReason, fetchLatestBaileysVersion } from "@whiskeysockets/baileys";
 
 import { unlinkSync } from "fs";
 import { v4 as uuidv4 } from "uuid";
@@ -18,16 +18,19 @@ import Contacts from "../models/Contacts.model.js";
 import Groups from "../models/Groups.model.js";
 import InstancesModel from "../models/instances.model.js";
 
-
+// Buscar automaticamente a versão mais recente
+// const { version } = await fetchLatestBaileysVersion();
+// console.log(version);
 
 class WhatsAppInstance {
+
     socketConfig = {
         defaultQueryTimeoutMs: undefined,
         printQRInTerminal: false,
         logger: pino({
             level: config.log.level,
         }),
-        //version,
+        version: config.version_connect,
         //auth: state,
         shouldSyncHistoryMessage: () => true,
         syncFullHistory: false,
