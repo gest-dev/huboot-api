@@ -39,7 +39,7 @@ export default {
     token: TOKEN,
     restoreSessionsOnStartup: RESTORE_SESSIONS_ON_START_UP,
     appUrl: APP_URL,
-    version_connect: process.env.SET_VERSION_WHATSAPP,
+    version_connect: version,
     log: {
         level: LOG_LEVEL,
     },
