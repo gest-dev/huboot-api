@@ -1,12 +1,15 @@
 import express from 'express';
 import { checkToken } from '../middlewares/ChechToken.js';
+import config from "../../config/config.js";
 const router = express.Router();
 
 import managerController from '../controllers/manager.controller.js';
 
 router.route('/').get(checkToken, (req, res) => {
   const key = req.query.key || null; // Ou obtenha o valor de onde for necessário
-  res.render('manager/dashboard', { error: req.flash('error'), success: req.flash('success'), key: key });
+  const version_connect = config.version_connect.join('.');
+
+  res.render('manager/dashboard', { error: req.flash('error'), success: req.flash('success'), key: key, version_whatsapp: version_connect });
 });
 
 router.route('/instance/:key').get(checkToken, managerController.instanceIndex);
