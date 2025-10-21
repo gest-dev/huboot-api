@@ -139,7 +139,7 @@ class WhatsAppInstance {
         }
 
         this.collection = mongoClient.db(config.mongoose.dbName).collection(this.key);
-        console.log('Collection name:', this.collection.collectionName);
+        //console.log('Collection name:', this.collection.collectionName);
 
         // Limpar sessões problemáticas antes de inicializar
         await this.clearProblematicSessions();
@@ -502,7 +502,7 @@ class WhatsAppInstance {
                 ) {
 
                     if (webhookData?.pushName && !webhookData?.key?.participant) {
-                        //console.log('Chegou webhookData de  direct_user: ', webhookData);
+                        console.log('Chegou webhookData de  direct_user: ', webhookData);
                         // tipo de mensgaem
                         const type_send_message = 'direct_user';
                         await this.SendWebhook('messages.upsert', webhookData, this.key, instanceConfigWebhookConfig, type_send_message);
