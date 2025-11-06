@@ -11,6 +11,8 @@ import routes from '../api/routes/index.js'; // Certifique-se da extensão .js
 // Inicializar o app
 const app = express();
 
+app.set('trust proxy', true); // necessário para Cloudflare
+
 // Configurar middleware global para tratar exceções
 exceptionHandler.handle();
 
